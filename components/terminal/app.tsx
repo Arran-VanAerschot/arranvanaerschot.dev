@@ -218,7 +218,7 @@ export default function TerminalApp() {
         <BootSequence key={bootKey} skip={!t.boot} onDone={() => setBooted(true)} />
       ) : (
         <div className="boot-fade" style={{ padding: '14px 16px 80px' }}>
-          <HeroSection ascii={t.ascii} banner={t.banner} />
+          <HeroSection banner={t.banner} />
           <ProjectsSection variant={t.projectsVariant} />
           <ExperienceSection />
           <StackSection />

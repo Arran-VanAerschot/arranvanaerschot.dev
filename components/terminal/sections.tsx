@@ -7,28 +7,11 @@ import type { ContentProject } from './types';
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-const ASCII_LINES = [
-  '   ▄▀█ █▀█ █▀█ ▄▀█ █▄ █',
-  '   █▀█ █▀▄ █▀▄ █▀█ █ ▀█',
-  '',
-  '   ╔══════════════════════╗',
-  '   ║  jr. swe / auto.eng  ║',
-  '   ║  brussels · be       ║',
-  '   ║  pgp 7E4A 91FC ····  ║',
-  '   ╚══════════════════════╝',
-];
-
-export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean }) {
+export function HeroSection({ banner }: { banner: boolean }) {
   const { identity } = useContent();
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
-      <div style={{ display: 'grid', gridTemplateColumns: ascii ? 'minmax(0, 320px) 1fr' : '1fr', gap: 36, alignItems: 'start' }}>
-        {ascii && (
-          <pre style={{ margin: 0, color: 'var(--t-ok)', fontSize: 12, lineHeight: 1.1, whiteSpace: 'pre' }}>
-            {ASCII_LINES.join('\n')}
-          </pre>
-        )}
-        <div>
+      <div>
           <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
             {identity.role.split('·').map((part, i) => (
               <span key={i}>
@@ -65,7 +48,6 @@ export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean
               ))}
             </div>
           )}
-        </div>
       </div>
     </Section>
   );
