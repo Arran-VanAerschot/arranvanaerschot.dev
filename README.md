@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# arranvanaerschot.dev
 
-## Getting Started
+My personal portfolio — a terminal-style interface built with Next.js 16, Drizzle ORM, and Neon Postgres. Features a fully interactive terminal emulator, live Spotify now-playing, a CMS-backed admin panel, and MDX notes.
 
-First, run the development server:
+## Stack
+
+- **Framework** — Next.js 16 (App Router, Turbopack)
+- **Database** — Neon Postgres via Drizzle ORM
+- **Auth** — JWT cookies with bcrypt, brute-force lockout, and security stamp revocation
+- **Content** — Admin CMS for projects, experience, skills, and now-items; MDX files for notes
+- **Integrations** — Spotify Web API (currently playing), Vercel Analytics, Speed Insights
+- **Styling** — Inline styles with CSS custom properties, CRT/noise overlays
+
+## Running locally
+
+**Prerequisites:** Node 20+, a [Neon](https://neon.tech) database
 
 ```bash
+git clone https://github.com/Arran-VanAerschot/arranvanaerschot.dev
+cd arranvanaerschot.dev
+npm install
+cp .env.example .env.local   # fill in your values
+npm run db:push              # apply schema to your database
+npm run db:seed              # create the initial admin user
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [`.env.example`](.env.example) for the full list. Required:
 
-## Learn More
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `AUTH_SECRET` | 32-byte hex string for JWT signing |
+| `ADMIN_EMAIL` | Admin login email |
+| `ADMIN_PASSWORD` | Admin login password |
+| `SPOTIFY_CLIENT_ID` | Spotify app client ID |
+| `SPOTIFY_CLIENT_SECRET` | Spotify app client secret |
+| `SPOTIFY_REFRESH_TOKEN` | Spotify refresh token (see below) |
 
-To learn more about Next.js, take a look at the following resources:
+### Getting a Spotify refresh token
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create an app at [developer.spotify.com](https://developer.spotify.com/dashboard)
+2. Add `https://oauth.pstmn.io/v1/callback` as a redirect URI
+3. Authorize: `https://accounts.spotify.com/authorize?client_id=YOUR_ID&response_type=code&redirect_uri=https://oauth.pstmn.io/v1/callback&scope=user-read-currently-playing`
+4. Exchange the code: `curl -X POST https://accounts.spotify.com/api/token -d "grant_type=authorization_code&code=CODE&redirect_uri=https://oauth.pstmn.io/v1/callback" -u "CLIENT_ID:CLIENT_SECRET"`
+5. Copy the `refresh_token` from the response
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Adding notes
 
-## Deploy on Vercel
+Drop `.mdx` files into `content/notes/`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```mdx
+---
+title: My note title
+date: 2026-05-25
+summary: One-line description shown in the list.
+tags: [tag1, tag2]
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Content here...
+```
+
+The filename becomes the URL slug.
+
+## Admin panel
+
+Available at `/admin` — log in with your `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Manage identity, projects, experience, skills, and now-items from there.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
