@@ -58,7 +58,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div style={{ minHeight: '100vh', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ui-sans-serif, system-ui, sans-serif' }}>
       <div style={{ width: 340, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 10, padding: 32 }}>
-        <div style={{ fontSize: 13, color: '#888', marginBottom: 24, fontFamily: 'ui-monospace, monospace' }}>arran@ava · /admin</div>
+        <div style={{ fontSize: 13, color: '#888', marginBottom: 24, fontFamily: 'ui-monospace, monospace' }}>root@arranvanaerschot · /admin</div>
         {err === '1' && (
           <div style={{ marginBottom: 16, padding: '8px 12px', background: '#2a1a1a', border: '1px solid #5a2a2a', borderRadius: 6, color: '#f87171', fontSize: 13 }}>
             invalid credentials

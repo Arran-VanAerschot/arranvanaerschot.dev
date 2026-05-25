@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div style={{ minHeight: '100vh', background: '#111', color: '#e5e5e5', fontFamily: 'ui-sans-serif, system-ui, sans-serif', fontSize: 14 }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 28, padding: '0 28px', background: '#1a1a1a', borderBottom: '1px solid #2a2a2a', height: 50 }}>
-        <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12, color: '#888' }}>arran@ava/admin</span>
+        <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12, color: '#888' }}>root@arranvanaerschot/admin</span>
         <nav style={{ display: 'flex', gap: 2, flex: 1 }}>
           {[
             ['dashboard', '/admin'],
