@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { listNotes } from '@/lib/notes';
 
-export const metadata = { title: 'notes · arran@ava' };
+export const metadata = { title: 'notes' };
 
 export default function NotesPage() {
   const notes = listNotes();

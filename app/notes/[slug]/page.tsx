@@ -1,10 +1,18 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getNote, listNotes } from '@/lib/notes';
 
 export async function generateStaticParams() {
   return listNotes().map((n) => ({ slug: n.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const note = getNote(slug);
+  if (!note) return {};
+  return { title: note.metadata.title };
 }
 
 export default async function NotePage({ params }: { params: Promise<{ slug: string }> }) {

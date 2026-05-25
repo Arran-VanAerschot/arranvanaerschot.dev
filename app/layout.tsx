@@ -35,7 +35,10 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "arran@ava ~ portfolio",
+  title: {
+    default: "arran@ava ~ portfolio",
+    template: "%s · arran@ava",
+  },
   description: "Arran Van Aerschot — Junior Software Engineer & Automation Engineer based in Brussels.",
 };
 
