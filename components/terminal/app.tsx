@@ -181,6 +181,7 @@ export default function TerminalApp() {
     ['--t-dim' as string]: theme.dim,
     ['--t-border' as string]: theme.border,
     ['--t-accent' as string]: theme.accent,
+    ['--t-bar' as string]: theme.bar,
     ['--t-ok' as string]: theme.ok,
     ['--t-info' as string]: theme.info,
     ['--t-warn' as string]: theme.warn,
@@ -218,7 +219,7 @@ export default function TerminalApp() {
         <BootSequence key={bootKey} skip={!t.boot} onDone={() => setBooted(true)} />
       ) : (
         <div className="boot-fade" style={{ padding: '14px 16px 80px' }}>
-          <HeroSection banner={t.banner} />
+          <HeroSection ascii={t.ascii} banner={t.banner} />
           <ProjectsSection variant={t.projectsVariant} />
           <ExperienceSection />
           <StackSection />

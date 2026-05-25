@@ -5,7 +5,7 @@ export type { Content, NoteMetadata };
 
 export interface Theme {
   bg: string; fg: string; dim: string; border: string;
-  accent: string; ok: string; info: string; warn: string;
+  accent: string; bar: string; ok: string; info: string; warn: string;
 }
 
 export interface Density {

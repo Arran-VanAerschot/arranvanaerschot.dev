@@ -4,11 +4,11 @@ import { useEffect, useState, ReactNode, CSSProperties } from 'react';
 import type { Theme, Density } from './types';
 
 export const T_THEMES: Record<string, Theme> = {
-  amber:   { bg: '#0c0d0e', fg: '#d4d3cc', dim: '#5d5e57', border: '#2a2b27', accent: '#e8a13a', ok: '#7eb87e', info: '#6ab0b3', warn: '#c97b9d' },
-  green:   { bg: '#06120a', fg: '#c8e6c8', dim: '#4f6b54', border: '#1a3320', accent: '#5dd06a', ok: '#a0e0a0', info: '#6ab0b3', warn: '#e89a5e' },
-  cyan:    { bg: '#06121a', fg: '#cbe0e6', dim: '#4d6770', border: '#1a2e36', accent: '#5fc8e0', ok: '#7eb87e', info: '#a0d8e0', warn: '#e89a5e' },
-  magenta: { bg: '#0e0a14', fg: '#e0d4e6', dim: '#665270', border: '#28203a', accent: '#d56fa8', ok: '#7eb87e', info: '#9eb8e0', warn: '#e89a5e' },
-  paper:   { bg: '#f4f1ea', fg: '#1c1c1a', dim: '#7a7972', border: '#cdc8bd', accent: '#a04e1f', ok: '#3e7b4d', info: '#2a6a7a', warn: '#a04e6e' },
+  amber:   { bg: '#0c0d0e', fg: '#d4d3cc', dim: '#5d5e57', border: '#2a2b27', accent: '#c9943a', bar: '#9a7030', ok: '#84ad84', info: '#6aa6a9', warn: '#c08299' },
+  green:   { bg: '#06120a', fg: '#c8e6c8', dim: '#4f6b54', border: '#1a3320', accent: '#5cbf66', bar: '#479a54', ok: '#93cf93', info: '#6aa6a9', warn: '#d89461' },
+  cyan:    { bg: '#06121a', fg: '#cbe0e6', dim: '#4d6770', border: '#1a2e36', accent: '#5cb8cf', bar: '#458b9e', ok: '#84ad84', info: '#94c9d4', warn: '#d89461' },
+  magenta: { bg: '#0e0a14', fg: '#e0d4e6', dim: '#665270', border: '#28203a', accent: '#c66f9c', bar: '#9a5478', ok: '#84ad84', info: '#94abd4', warn: '#d89461' },
+  paper:   { bg: '#f4f1ea', fg: '#1c1c1a', dim: '#7a7972', border: '#cdc8bd', accent: '#9a5226', bar: '#b07b50', ok: '#3e7b4d', info: '#2a6a7a', warn: '#a04e6e' },
 };
 
 export const T_FONTS: Record<string, string> = {
@@ -76,7 +76,7 @@ export function Section({ id, cmd, path = '~', children }: SectionProps) {
 
 // ── BlinkCursor ──────────────────────────────────────────────────────────────
 
-export function BlinkCursor({ ch = '▌' }: { ch?: string }) {
+export function BlinkCursor({ ch = '▏' }: { ch?: string }) {
   const [on, setOn] = useState(true);
   useEffect(() => {
     const i = setInterval(() => setOn((x) => !x), 530);
@@ -91,17 +91,19 @@ export function Sparkline({ values, width = 16 }: { values: number[]; width?: nu
   const chars = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
   const max = Math.max(...values, 1);
   const out = values.slice(-width).map((v) => chars[Math.min(7, Math.floor((v / max) * 8))]).join('');
-  return <span style={{ fontFamily: 'inherit', color: 'var(--t-accent)', letterSpacing: 0 }}>{out}</span>;
+  return <span style={{ fontFamily: 'inherit', color: 'var(--t-bar)', letterSpacing: 0 }}>{out}</span>;
 }
 
 // ── CharBar ──────────────────────────────────────────────────────────────────
 
 export function CharBar({ pct, width = 18 }: { pct: number; width?: number }) {
   const filled = Math.round((pct / 100) * width);
+  const tip = filled > 0 ? 1 : 0;
   return (
     <span style={{ letterSpacing: 0 }}>
-      <span style={{ color: 'var(--t-accent)' }}>{'█'.repeat(filled)}</span>
-      <span style={{ color: 'var(--t-border)' }}>{'░'.repeat(width - filled)}</span>
+      <span style={{ color: 'var(--t-bar)' }}>{'█'.repeat(filled - tip)}</span>
+      {tip > 0 && <span style={{ color: 'var(--t-accent)' }}>{'█'}</span>}
+      <span style={{ color: 'color-mix(in oklab, var(--t-border) 60%, var(--t-bg))' }}>{'░'.repeat(width - filled)}</span>
     </span>
   );
 }

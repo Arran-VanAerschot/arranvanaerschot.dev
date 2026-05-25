@@ -347,17 +347,19 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
             style={{
               flex: 1, background: 'transparent', border: 'none', outline: 'none',
               color: 'var(--t-fg)', fontFamily: 'inherit', fontSize: 'inherit',
-              caretColor: 'var(--t-accent)',
+              caretColor: 'transparent',
             }}
           />
+          <span style={{ position: 'absolute', left: `${draft.length}ch`, top: 0, pointerEvents: 'none' }}>
+            <BlinkCursor />
+          </span>
           {hint && (
             <span style={{
-              position: 'absolute', left: `${draft.length}ch`, color: 'var(--t-dim)',
+              position: 'absolute', left: `${draft.length + 1}ch`, color: 'var(--t-dim)',
               pointerEvents: 'none', whiteSpace: 'pre',
             }}>{hint}<span style={{ fontSize: 10, marginLeft: 4 }}>[tab]</span></span>
           )}
         </div>
-        <BlinkCursor />
       </form>
     </div>
   );
