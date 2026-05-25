@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame } from './components';
+import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile } from './components';
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
 
@@ -9,6 +9,7 @@ import type { ContentProject } from './types';
 
 export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?: boolean }) {
   const { identity } = useContent();
+  const mobile = useIsMobile();
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
       <div>
@@ -37,7 +38,7 @@ export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?
           ))}
         </div>
         {banner && identity.stats.length > 0 && (
-          <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: mobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12 }}>
             {identity.stats.map((s) => (
               <BoxFrame key={s.k} title={s.k}>
                 <div style={{ fontSize: 28, color: 'var(--t-accent)' }}>{s.v}</div>
@@ -108,7 +109,36 @@ function ProjectsTable({ items, toggle, arrow }: {
   toggle: (col: SortKey) => void;
   arrow: (col: SortKey) => string;
 }) {
+  const mobile = useIsMobile();
   const grid = '24px 1.1fr 70px 60px 1.6fr 1.8fr 50px';
+
+  if (mobile) {
+    return (
+      <div>
+        {items.map((p, i) => (
+          <div key={p.id} className="t-row-hover"
+            style={{ padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span>
+                <span style={{ color: 'var(--t-dim)', fontSize: 11, marginRight: 6 }}>{String(i + 1).padStart(2, '0')}</span>
+                <span style={{ color: 'var(--t-accent)' }}>./</span>
+                <span style={{ textDecoration: 'underline', textDecorationStyle: 'dashed', textUnderlineOffset: 3, textDecorationColor: 'var(--t-border)' }}>{p.id}</span>
+              </span>
+              <span style={{ color: 'var(--t-ok)', fontSize: 12 }}>★ {p.stars}</span>
+            </div>
+            <div style={{ marginTop: 4, fontSize: 12, color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))' }}>{p.tagline}</div>
+            <div style={{ marginTop: 4, display: 'flex', gap: 8, fontSize: 11 }}>
+              <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
+              <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
+              <span style={{ color: 'var(--t-info)' }}>{p.stack.join(', ')}</span>
+            </div>
+          </div>
+        ))}
+        {items.length === 0 && <div style={{ padding: 14, color: 'var(--t-dim)' }}>no matches.</div>}
+      </div>
+    );
+  }
+
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: grid, gap: 12, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
@@ -163,7 +193,7 @@ function ProjectsGitLog({ items }: { items: ContentProject[] }) {
       {items.map((p) => (
         <div key={p.id} className="t-row-hover"
           style={{ display: 'block', padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
             <span style={{ color: 'var(--t-accent)', fontSize: 11 }}>{(p.id + p.y).slice(0, 8)}</span>
             <span style={{ color: 'var(--t-dim)' }}>({p.y})</span>
             <span style={{ color: 'var(--t-warn)', fontSize: 11 }}>[{p.kind}]</span>
@@ -181,11 +211,12 @@ function ProjectsGitLog({ items }: { items: ContentProject[] }) {
 
 export function ExperienceSection() {
   const { experience } = useContent();
+  const mobile = useIsMobile();
   return (
     <Section id="sec-experience" label="03 Experience" path="~" cmd="git log --oneline --branch=career">
       <div>
         {experience.map((e, i) => (
-          <div key={i} style={{ borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', padding: '14px 0', display: 'grid', gridTemplateColumns: '160px 1fr', gap: 28 }}>
+          <div key={i} style={{ borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', padding: '14px 0', display: 'grid', gridTemplateColumns: mobile ? '1fr' : '160px 1fr', gap: mobile ? 8 : 28 }}>
             <div>
               <div style={{ color: 'var(--t-accent)', fontSize: 12 }}>{e.when}</div>
               <div style={{ color: 'var(--t-dim)', fontSize: 11, marginTop: 4 }}>{e.loc}</div>
@@ -215,6 +246,7 @@ export function ExperienceSection() {
 
 export function StackSection() {
   const { skills } = useContent();
+  const mobile = useIsMobile();
   const [history, setHistory] = useState<number[][]>(() =>
     skills.map(() => Array.from({ length: 16 }, () => 30 + Math.random() * 60))
   );
@@ -232,19 +264,36 @@ export function StackSection() {
 
   return (
     <Section id="sec-stack" label="04 Stack" path="~" cmd="htop --sort cpu">
-      <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        <span>process</span><span>cpu%</span><span>load</span><span>cmd</span>
-      </div>
-      {skills.map((s, i) => (
-        <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
-          <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CharBar pct={s.cpu} width={14} />
-            <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
-          </span>
-          <span><Sparkline values={history[i] ?? []} width={20} /></span>
-          <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
+      {!mobile && (
+        <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span>process</span><span>cpu%</span><span>load</span><span>cmd</span>
         </div>
+      )}
+      {mobile && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span>process</span><span>cpu%</span>
+        </div>
+      )}
+      {skills.map((s, i) => (
+        mobile ? (
+          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
+            <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CharBar pct={s.cpu} width={10} />
+              <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
+            </span>
+          </div>
+        ) : (
+          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
+            <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CharBar pct={s.cpu} width={14} />
+              <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
+            </span>
+            <span><Sparkline values={history[i] ?? []} width={20} /></span>
+            <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
+          </div>
+        )
       ))}
     </Section>
   );
@@ -325,9 +374,10 @@ export function NowSection() {
 
 export function ContactSection() {
   const { identity } = useContent();
+  const mobile = useIsMobile();
   return (
     <Section id="sec-contact" label="06 Contact" path="~" cmd="cat contact.txt">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 24 }}>
         <div>
           <div style={{ color: 'var(--t-accent)', fontSize: 22, marginBottom: 12 }}>say hello.</div>
           <div style={{ color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', maxWidth: 480, lineHeight: 1.6 }}>

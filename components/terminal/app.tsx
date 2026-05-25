@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, CSSProperties } from 'react';
 import Link from 'next/link';
-import { T_THEMES, T_FONTS, T_DENSITY } from './components';
+import { T_THEMES, T_FONTS, T_DENSITY, useIsMobile } from './components';
 import { useContent } from './content-context';
 import { HeroSection, ProjectsSection, ExperienceSection, StackSection, NowSection, ContactSection } from './sections';
 import { TerminalPrompt } from './prompt';
@@ -70,6 +70,7 @@ function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
 
 function StatusBarTop() {
   const { identity } = useContent();
+  const mobile = useIsMobile();
   const [time, setTime] = useState('');
   useEffect(() => {
     const update = () => setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
@@ -85,21 +86,24 @@ function StatusBarTop() {
       fontSize: 12, height: 36, boxSizing: 'border-box',
       position: 'sticky', top: 0, zIndex: 31,
     }}>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
         <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, var(--t-warn) 70%, transparent)' }} />
         <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, var(--t-accent) 70%, transparent)' }} />
         <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, var(--t-ok) 70%, transparent)' }} />
       </div>
-      <div style={{ flex: 1, textAlign: 'center', color: 'var(--t-dim)' }}>
-        {identity.handle} ~ /portfolio · zsh ·{' '}
-        <span style={{ color: 'var(--t-accent)' }}>v3.1.4</span>
-      </div>
-      <div style={{ color: 'var(--t-dim)' }}>{time}</div>
+      {!mobile && (
+        <div style={{ flex: 1, textAlign: 'center', color: 'var(--t-dim)' }}>
+          {identity.handle} ~ /portfolio · zsh ·{' '}
+          <span style={{ color: 'var(--t-accent)' }}>v3.1.4</span>
+        </div>
+      )}
+      <div style={{ flex: mobile ? 1 : undefined, textAlign: mobile ? 'right' : undefined, color: 'var(--t-dim)' }}>{time}</div>
     </div>
   );
 }
 
 function StatusBarBottom({ section }: { section: string }) {
+  const mobile = useIsMobile();
   return (
     <div style={{
       position: 'fixed', left: 0, right: 0, bottom: 0, height: 28,
@@ -111,9 +115,13 @@ function StatusBarBottom({ section }: { section: string }) {
       <span style={{ background: 'var(--t-bg)', color: 'var(--t-accent)', padding: '2px 8px', marginRight: 12 }}>NORMAL</span>
       <span>{section}</span>
       <span style={{ flex: 1 }} />
-      <span>main ↑0 · ↓0 · clean</span>
-      <span style={{ marginLeft: 20 }}>utf-8</span>
-      <span style={{ marginLeft: 20 }}>{new Date().getFullYear()}</span>
+      {!mobile && (
+        <>
+          <span>main ↑0 · ↓0 · clean</span>
+          <span style={{ marginLeft: 20 }}>utf-8</span>
+          <span style={{ marginLeft: 20 }}>{new Date().getFullYear()}</span>
+        </>
+      )}
     </div>
   );
 }
@@ -129,6 +137,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export default function TerminalApp() {
+  const mobile = useIsMobile();
   const [t, setValues] = useState<TweakValues>(DEFAULTS);
   const [booted, setBooted] = useState(false);
   const [bootKey, setBootKey] = useState(0);
@@ -214,7 +223,7 @@ export default function TerminalApp() {
           }}>{label}</Link>
         ))}
         <div style={{ flex: 1 }} />
-        <div style={{ display: 'flex', alignItems: 'center', color: 'var(--t-dim)' }}>uptime 14d · 0 alerts · main ↑0</div>
+        {!mobile && <div style={{ display: 'flex', alignItems: 'center', color: 'var(--t-dim)' }}>uptime 14d · 0 alerts · main ↑0</div>}
       </div>
 
       <TerminalPrompt setTweak={setTweak} reboot={reboot} />

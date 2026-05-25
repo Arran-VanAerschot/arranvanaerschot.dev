@@ -4,6 +4,18 @@ import { useEffect, useState, ReactNode, CSSProperties } from 'react';
 import type { Theme, Density } from './types';
 import { useContent } from './content-context';
 
+export function useIsMobile(breakpoint = 640): boolean {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    setMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [breakpoint]);
+  return mobile;
+}
+
 export const T_THEMES: Record<string, Theme> = {
   amber:   { bg: '#0c0d0e', fg: '#d4d3cc', dim: '#5d5e57', border: '#2a2b27', accent: '#c9943a', bar: '#9a7030', ok: '#84ad84', info: '#6aa6a9', warn: '#c08299' },
   green:   { bg: '#06120a', fg: '#c8e6c8', dim: '#4f6b54', border: '#1a3320', accent: '#5cbf66', bar: '#479a54', ok: '#93cf93', info: '#6aa6a9', warn: '#d89461' },

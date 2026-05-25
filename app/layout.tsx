@@ -27,6 +27,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "arran@ava ~ portfolio",
   description: "Arran Van Aerschot — Junior Software Engineer & Automation Engineer based in Brussels.",
