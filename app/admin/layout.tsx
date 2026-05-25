@@ -10,8 +10,7 @@ async function logoutAction() {
   redirect('/admin/login');
 }
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAuth();
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ minHeight: '100vh', background: '#111', color: '#e5e5e5', fontFamily: 'ui-sans-serif, system-ui, sans-serif', fontSize: 14 }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 28, padding: '0 28px', background: '#1a1a1a', borderBottom: '1px solid #2a2a2a', height: 50 }}>
