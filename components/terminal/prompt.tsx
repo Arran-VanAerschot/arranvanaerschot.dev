@@ -218,6 +218,14 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Refs to read current state inside the stable global keydown listener
+  const stackRef    = useRef(stack);
+  const stackIdxRef = useRef(stackIdx);
+  const hintRef     = useRef(hint);
+  useEffect(() => { stackRef.current    = stack;    }, [stack]);
+  useEffect(() => { stackIdxRef.current = stackIdx; }, [stackIdx]);
+  useEffect(() => { hintRef.current     = hint;     }, [hint]);
+
   const ctx = useMemo<InterpretCtx>(() => ({
     go: scrollTo,
     navigate: (url: string) => router.push(url),
@@ -227,17 +235,73 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
     content,
   }), [setTweak, reboot, content, router]);
 
+  // Keep a ref to submit so the global listener can call it without being
+  // re-registered on every keystroke (submit changes every time draft changes).
+  // Initialized to a stub; synced after submit is defined below.
+  const submitRef = useRef<() => void>(() => {});
+
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const SKIP_KEYS = new Set([
+      'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+      'Tab','CapsLock','NumLock','ScrollLock','Pause','Insert',
+      'Home','End','PageUp','PageDown','ContextMenu',
+      'Meta','Alt','Control','Shift','Dead','Unidentified',
+    ]);
+
+    const handler = (e: KeyboardEvent) => {
+      // ⌘K / Ctrl+K — always focus + select regardless of where focus is
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         inputRef.current?.focus();
         inputRef.current?.select();
+        return;
       }
+
+      // Already in the input — handled by React's onKeyDown
+      if (e.target === inputRef.current) return;
+
+      // Don't steal keys from links, buttons, other inputs
+      const tag = (e.target as HTMLElement)?.tagName?.toUpperCase() ?? '';
+      if (['INPUT','TEXTAREA','SELECT','BUTTON','A'].includes(tag)) return;
+      if ((e.target as HTMLElement)?.isContentEditable) return;
+
+      // Pass through modifier combos (browser shortcuts)
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (SKIP_KEYS.has(e.key)) return;
+
+      e.preventDefault();
+
+      if (e.key === 'Backspace') {
+        setDraft((d) => d.slice(0, -1));
+      } else if (e.key === 'Enter') {
+        submitRef.current();
+      } else if (e.key === 'ArrowUp') {
+        const next = Math.min(stackRef.current.length - 1, stackIdxRef.current + 1);
+        setStackIdx(next);
+        if (stackRef.current[next] !== undefined) setDraft(stackRef.current[next]);
+      } else if (e.key === 'ArrowDown') {
+        const next = Math.max(-1, stackIdxRef.current - 1);
+        setStackIdx(next);
+        setDraft(next === -1 ? '' : stackRef.current[next]);
+      } else if (e.key === 'Tab') {
+        if (hintRef.current) {
+          setDraft((d) => d + hintRef.current);
+          setHint('');
+        }
+      } else if (e.key === 'Escape') {
+        setDraft('');
+        setHint('');
+      } else if (e.key.length === 1) {
+        setDraft((d) => d + e.key);
+      }
+
+      inputRef.current?.focus();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []); // stable — all mutable values accessed through refs
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -274,6 +338,7 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
     const results = interpret(line, ctx);
     setHistory((h) => [...h, { cmd: line, results: results ?? [] }]);
   }, [draft, ctx]);
+  useEffect(() => { submitRef.current = submit; }, [submit]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp') {
