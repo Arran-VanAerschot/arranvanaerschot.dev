@@ -257,11 +257,33 @@ const TAG_COLORS: Record<string, string> = {
   'READ ': 'var(--t-info)',
   'LEARN': 'var(--t-warn)',
   'OPEN ': 'var(--t-accent)',
+  'PLAY ': '#1DB954',
 };
+
+type SpotifyState = { isPlaying: false } | { isPlaying: true; title: string; artist: string; url: string };
+
+function useSpotify() {
+  const [state, setState] = useState<SpotifyState>({ isPlaying: false });
+  useEffect(() => {
+    let cancelled = false;
+    async function poll() {
+      try {
+        const res = await fetch('/api/spotify');
+        const data = await res.json();
+        if (!cancelled) setState(data);
+      } catch { /* ignore */ }
+    }
+    poll();
+    const id = setInterval(poll, 30000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+  return state;
+}
 
 export function NowSection() {
   const { now } = useContent();
   const [tick, setTick] = useState(0);
+  const spotify = useSpotify();
   useEffect(() => {
     const i = setInterval(() => setTick((t) => t + 1), 4000);
     return () => clearInterval(i);
@@ -280,6 +302,15 @@ export function NowSection() {
           </div>
         );
       })}
+      {spotify.isPlaying && (
+        <div style={{ padding: '4px 0', fontSize: 13 }}>
+          <span style={{ color: 'var(--t-dim)' }}>{new Date(Date.now() - tick * 1000).toISOString().replace('T', ' ').slice(0, 19)}</span>{' '}
+          <span style={{ color: '#1DB954' }}>[PLAY ]</span>{' '}
+          <a href={spotify.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--t-fg)', textDecoration: 'none' }}>
+            {spotify.title} <span style={{ color: 'var(--t-dim)' }}>— {spotify.artist}</span>
+          </a>
+        </div>
+      )}
       <div style={{ padding: '4px 0', color: 'var(--t-dim)' }}>(streaming) <BlinkCursor /></div>
     </Section>
   );
