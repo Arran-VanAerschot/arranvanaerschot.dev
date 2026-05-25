@@ -55,14 +55,9 @@ export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean
             ))}
           </div>
 
-          {banner && (
+          {banner && identity.stats.length > 0 && (
             <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-              {[
-                { k: 'YEARS',     v: '03', d: 'shipping' },
-                { k: 'PROD SVCS', v: '11', d: 'on-call' },
-                { k: 'LANG',      v: '6',  d: 'in use' },
-                { k: 'PAGERS',    v: '00', d: 'this month' },
-              ].map((s) => (
+              {identity.stats.map((s) => (
                 <BoxFrame key={s.k} title={s.k}>
                   <div style={{ fontSize: 28, color: 'var(--t-accent)' }}>{s.v}</div>
                   <div style={{ fontSize: 11, color: 'var(--t-dim)' }}>{s.d}</div>
