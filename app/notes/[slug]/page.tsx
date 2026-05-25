@@ -22,7 +22,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
     }}>
       <div style={{ maxWidth: 740, margin: '0 auto' }}>
         <nav style={{ display: 'flex', gap: 6, marginBottom: 48, fontSize: 12, color: '#5d5e57' }}>
-          <Link href="/" style={{ color: '#5d5e57', textDecoration: 'none' }}>arran@ava</Link>
+          <Link href="/" style={{ color: '#5d5e57', textDecoration: 'none' }}>root@arranvanaerschot</Link>
           <span>/</span>
           <Link href="/notes" style={{ color: '#5d5e57', textDecoration: 'none' }}>notes</Link>
           <span>/</span>
