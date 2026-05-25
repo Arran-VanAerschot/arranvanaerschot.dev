@@ -21,9 +21,9 @@ export default function NotesPage() {
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 32 }}>
-          <span style={{ color: '#e8a13a' }}>arran</span>
+          <span style={{ color: '#e8a13a' }}>root</span>
           <span style={{ color: '#5d5e57' }}>@</span>
-          <span style={{ color: '#7eb87e' }}>ava</span>
+          <span style={{ color: '#7eb87e' }}>arranvanaerschot</span>
           <span style={{ color: '#5d5e57' }}>:~/notes$&nbsp;</span>
           <span>ls -la</span>
         </div>
