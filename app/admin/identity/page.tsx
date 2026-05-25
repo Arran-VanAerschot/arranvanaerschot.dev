@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { identity } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
@@ -20,9 +21,9 @@ async function saveIdentity(formData: FormData) {
     pgp:       String(formData.get('pgp')      ?? ''),
     resumeUrl: formData.get('resumeUrl') ? String(formData.get('resumeUrl')) : null,
   };
-  await db.insert(identity).values({ id: 1, ...data })
-    .onConflictDoUpdate({ target: identity.id, set: data });
+  await db.update(identity).set(data).where(eq(identity.id, 1));
   revalidatePath('/');
+  revalidatePath('/admin/identity');
   redirect('/admin/identity?saved=1');
 }
 
