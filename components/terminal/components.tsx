@@ -74,13 +74,14 @@ interface SectionProps {
 }
 
 export function Section({ id, cmd, path = '~', children }: SectionProps) {
+  const mobile = useIsMobile();
   return (
     <section id={id} style={{ marginTop: 'var(--t-sec)' }}>
       <Prompt path={path} cmd={cmd} />
       <div style={{
-        padding: 'var(--t-row) 0 0 28px',
+        padding: mobile ? 'var(--t-row) 0 0 12px' : 'var(--t-row) 0 0 28px',
         borderLeft: '1px solid var(--t-border)',
-        marginLeft: 8,
+        marginLeft: mobile ? 0 : 8,
         marginTop: 6,
       }}>
         {children}
