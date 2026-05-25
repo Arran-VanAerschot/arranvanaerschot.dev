@@ -322,9 +322,10 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
       setHint(m ? m.slice(head.length) : '');
     } else if (head === 'cat' || head === 'open') {
       const last = rest.join(' ');
+      const resume = head === 'cat' && 'resume.pdf'.startsWith(last) && 'resume.pdf' !== last ? 'resume.pdf' : null;
       const p = content.projects.find((x) => x.id.startsWith(last) && x.id !== last);
       const n = content.notes.find((x) => x.slug.startsWith(last) && x.slug !== last);
-      setHint(p ? p.id.slice(last.length) : n ? n.slug.slice(last.length) : '');
+      setHint(resume ? resume.slice(last.length) : p ? p.id.slice(last.length) : n ? n.slug.slice(last.length) : '');
     } else if (head === 'cd') {
       const last = rest.join(' ');
       const keys = Object.keys(SECTION_MAP);
