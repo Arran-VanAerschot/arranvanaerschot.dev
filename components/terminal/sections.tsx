@@ -297,11 +297,11 @@ export function ContactSection() {
         <div>
           <div style={{ color: 'var(--t-accent)', fontSize: 22, marginBottom: 12 }}>say hello.</div>
           <div style={{ color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', maxWidth: 480, lineHeight: 1.6 }}>
-            best place is email — i reply within a day. open for contract or perm work from
+            best reached by email or linkedin — i reply within a day. open for contract or perm work from
             <span style={{ color: 'var(--t-accent)' }}> Q3 2026</span>. remote EU or Brussels.
           </div>
           <div style={{ marginTop: 18 }}>
-            <a href={`mailto:${identity.email}`} style={{ color: 'var(--t-accent)', fontSize: 20, textDecoration: 'underline', textUnderlineOffset: 4 }}>
+            <a href={`mailto:${identity.email}`} style={{ color: 'var(--t-accent)', fontSize: 14, textDecoration: 'underline', textUnderlineOffset: 4 }}>
               {identity.email}
             </a>
           </div>
