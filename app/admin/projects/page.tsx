@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
 import { A } from '../_styles';
+import { SavedBanner } from '../_saved-banner';
 
 async function deleteProject(formData: FormData) {
   'use server';
@@ -13,10 +14,12 @@ async function deleteProject(formData: FormData) {
   revalidatePath('/admin/projects');
 }
 
-export default async function ProjectsListPage() {
+export default async function ProjectsListPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const items = await db.select().from(projects).orderBy(asc(projects.sortOrder));
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 28px' }}>
+      {saved && <SavedBanner />}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h1 style={{ ...A.h1, margin: 0 }}>Projects</h1>
         <Link href="/admin/projects/new" style={{ ...A.btn, display: 'inline-block', textDecoration: 'none' } as React.CSSProperties}>+ new project</Link>

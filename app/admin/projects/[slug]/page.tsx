@@ -23,7 +23,7 @@ async function updateProject(slug: string, formData: FormData) {
   await db.update(projects).set(data).where(eq(projects.slug, slug));
   revalidatePath('/');
   revalidatePath(`/projects/${slug}`);
-  redirect('/admin/projects');
+  redirect('/admin/projects?saved=1');
 }
 
 export default async function EditProjectPage({ params }: { params: Promise<{ slug: string }> }) {

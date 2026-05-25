@@ -16,7 +16,7 @@ async function updateExperience(id: number, formData: FormData) {
     sortOrder: Number(formData.get('sortOrder') ?? 0),
   }).where(eq(experience.id, id));
   revalidatePath('/');
-  redirect('/admin/experience');
+  redirect('/admin/experience?saved=1');
 }
 
 export default async function EditExperiencePage({ params }: { params: Promise<{ id: string }> }) {

@@ -1,7 +1,9 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { identity } from '@/lib/db/schema';
 import { A } from '../_styles';
+import { SavedBanner } from '../_saved-banner';
 
 async function saveIdentity(formData: FormData) {
   'use server';
@@ -21,9 +23,11 @@ async function saveIdentity(formData: FormData) {
   await db.insert(identity).values({ id: 1, ...data })
     .onConflictDoUpdate({ target: identity.id, set: data });
   revalidatePath('/');
+  redirect('/admin/identity?saved=1');
 }
 
-export default async function IdentityPage() {
+export default async function IdentityPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const id = await db.query.identity.findFirst();
   const F = (name: string, label: string, value: string, type = 'text') => (
     <div style={A.field}>
@@ -34,6 +38,7 @@ export default async function IdentityPage() {
 
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 28px' }}>
+      {saved && <SavedBanner />}
       <h1 style={A.h1}>Identity</h1>
       <form action={saveIdentity}>
         <div style={A.card}>

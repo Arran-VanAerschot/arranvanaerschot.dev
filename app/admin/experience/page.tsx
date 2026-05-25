@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { experience } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
 import { A } from '../_styles';
+import { SavedBanner } from '../_saved-banner';
 
 async function deleteExperience(formData: FormData) {
   'use server';
@@ -24,13 +25,15 @@ async function addExperience(formData: FormData) {
     sortOrder: Number(formData.get('sortOrder') ?? 99),
   });
   revalidatePath('/');
-  redirect('/admin/experience');
+  redirect('/admin/experience?saved=1');
 }
 
-export default async function ExperiencePage() {
+export default async function ExperiencePage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const items = await db.select().from(experience).orderBy(asc(experience.sortOrder));
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 28px' }}>
+      {saved && <SavedBanner />}
       <h1 style={A.h1}>Experience</h1>
 
       {/* List */}

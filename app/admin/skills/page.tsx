@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { skills } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
 import { A } from '../_styles';
+import { SavedBanner } from '../_saved-banner';
 
 async function updateSkill(formData: FormData) {
   'use server';
@@ -15,6 +16,7 @@ async function updateSkill(formData: FormData) {
     sortOrder: Number(formData.get('sort')  ?? 0),
   }).where(eq(skills.id, id));
   revalidatePath('/');
+  redirect('/admin/skills?saved=1');
 }
 
 async function deleteSkill(formData: FormData) {
@@ -32,14 +34,16 @@ async function addSkill(formData: FormData) {
     sortOrder: Number(formData.get('sort') ?? 99),
   });
   revalidatePath('/');
-  redirect('/admin/skills');
+  redirect('/admin/skills?saved=1');
 }
 
-export default async function SkillsPage() {
+export default async function SkillsPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const items = await db.select().from(skills).orderBy(asc(skills.sortOrder));
 
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 28px' }}>
+      {saved && <SavedBanner />}
       <h1 style={A.h1}>Skills</h1>
 
       <div style={A.card}>

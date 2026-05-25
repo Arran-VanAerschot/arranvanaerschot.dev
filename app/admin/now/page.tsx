@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { nowItems } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
 import { A } from '../_styles';
+import { SavedBanner } from '../_saved-banner';
 
 const TAGS = ['BUILD', 'READ ', 'LEARN', 'OPEN '];
 
@@ -16,6 +17,7 @@ async function updateNow(formData: FormData) {
     sortOrder: Number(formData.get('sort') ?? 0),
   }).where(eq(nowItems.id, id));
   revalidatePath('/');
+  redirect('/admin/now?saved=1');
 }
 
 async function deleteNow(formData: FormData) {
@@ -32,14 +34,16 @@ async function addNow(formData: FormData) {
     sortOrder: Number(formData.get('sort') ?? 99),
   });
   revalidatePath('/');
-  redirect('/admin/now');
+  redirect('/admin/now?saved=1');
 }
 
-export default async function NowPage() {
+export default async function NowPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const items = await db.select().from(nowItems).orderBy(asc(nowItems.sortOrder));
 
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 28px' }}>
+      {saved && <SavedBanner />}
       <h1 style={A.h1}>Now</h1>
 
       <div style={A.card}>

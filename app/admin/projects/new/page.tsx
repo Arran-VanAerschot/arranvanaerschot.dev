@@ -23,7 +23,7 @@ async function createProject(formData: FormData) {
     sortOrder: Number(formData.get('sortOrder') ?? 99),
   });
   revalidatePath('/');
-  redirect('/admin/projects');
+  redirect('/admin/projects?saved=1');
 }
 
 export default function NewProjectPage() {
