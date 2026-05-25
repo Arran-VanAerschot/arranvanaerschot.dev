@@ -19,7 +19,6 @@ async function saveIdentity(formData: FormData) {
     github:    String(formData.get('github')   ?? ''),
     linkedin:  String(formData.get('linkedin') ?? ''),
     readcv:    String(formData.get('readcv')   ?? ''),
-    pgp:       String(formData.get('pgp')      ?? ''),
     resumeUrl: formData.get('resumeUrl') ? String(formData.get('resumeUrl')) : null,
     avatarUrl: formData.get('avatarUrl') ? String(formData.get('avatarUrl')) : null,
     bio:       String(formData.get('bio')      ?? ''),
@@ -65,7 +64,6 @@ export default async function IdentityPage({ searchParams }: { searchParams: Pro
           {F('github',    'GitHub',      id?.github    ?? '')}
           {F('linkedin',  'LinkedIn',    id?.linkedin  ?? '')}
           {F('readcv',    'Read.cv',     id?.readcv    ?? '')}
-          {F('pgp',       'PGP key ID',  id?.pgp       ?? '')}
           {F('resumeUrl', 'Resume URL',  id?.resumeUrl ?? '')}
           {F('avatarUrl', 'Avatar image URL', id?.avatarUrl ?? '')}
         </div>

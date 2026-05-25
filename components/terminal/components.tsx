@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ReactNode, CSSProperties } from 'react';
 import type { Theme, Density } from './types';
+import { useContent } from './content-context';
 
 export const T_THEMES: Record<string, Theme> = {
   amber:   { bg: '#0c0d0e', fg: '#d4d3cc', dim: '#5d5e57', border: '#2a2b27', accent: '#c9943a', bar: '#9a7030', ok: '#84ad84', info: '#6aa6a9', warn: '#c08299' },
@@ -34,11 +35,13 @@ interface PromptProps {
 }
 
 export function Prompt({ path = '~', cmd, dim, children }: PromptProps) {
+  const { identity } = useContent();
+  const [user, host] = identity.handle.split('@');
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline' }}>
-      <span style={{ color: 'var(--t-accent)' }}>arran</span>
+      <span style={{ color: 'var(--t-accent)' }}>{user}</span>
       <span style={{ color: 'var(--t-dim)' }}>@</span>
-      <span style={{ color: 'var(--t-ok)' }}>ava</span>
+      <span style={{ color: 'var(--t-ok)' }}>{host}</span>
       <span style={{ color: 'var(--t-dim)' }}>:</span>
       <span style={{ color: 'var(--t-info)' }}>{path}</span>
       <span style={{ color: 'var(--t-dim)' }}>$&nbsp;</span>

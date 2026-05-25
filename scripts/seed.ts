@@ -16,7 +16,6 @@ const IDENTITY = {
   github: 'github.com/avanaerschot',
   linkedin: 'linkedin.com/in/avanaerschot',
   readcv: 'read.cv/arran',
-  pgp: '7E4A 91FC 22BD 0044',
   resumeUrl: null,
   bio: 'I build backend services — mostly .NET, sometimes Go — wire up React/Next when a UI is needed, and write a lot of glue around docker, postgres, and github actions. Happiest in the gap between "this works" and "this is actually maintained."',
   stats: [

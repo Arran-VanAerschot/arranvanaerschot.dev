@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, CSSProperties } from 'react';
 import Link from 'next/link';
 import { T_THEMES, T_FONTS, T_DENSITY } from './components';
+import { useContent } from './content-context';
 import { HeroSection, ProjectsSection, ExperienceSection, StackSection, NowSection, ContactSection } from './sections';
 import { TerminalPrompt } from './prompt';
 import type { TweakValues, SetTweak } from './types';
@@ -22,19 +23,21 @@ const DEFAULTS: TweakValues = {
   animation: 2,
 };
 
-const BOOT_LINES = [
-  { d: 60,  ok: 'OK', text: 'Loading kernel … linux 6.7.4-arran-portfolio',        info: false },
-  { d: 90,  ok: 'OK', text: 'Mounting /etc/identity … arran@ava',                   info: true  },
-  { d: 80,  ok: 'OK', text: 'Started resume.service',                               info: true  },
-  { d: 100, ok: 'OK', text: 'Started projects.target · 8 unit(s)',                  info: true  },
-  { d: 80,  ok: 'OK', text: 'Started experience.timer',                             info: true  },
-  { d: 70,  ok: 'OK', text: 'Started stack.htop · 12 procs',                        info: true  },
-  { d: 70,  ok: 'OK', text: 'Started now.stream',                                   info: true  },
-  { d: 50,  ok: 'OK', text: 'Started contact.daemon',                               info: true  },
-  { d: 90,  ok: '··', text: 'Reaching recruiters.local … welcome',                  info: false },
+const bootLines = (handle: string) => [
+  { d: 60,  ok: 'OK', text: `Loading kernel … linux 6.7.4-${handle.split('@')[0]}-portfolio`, info: false },
+  { d: 90,  ok: 'OK', text: `Mounting /etc/identity … ${handle}`,                             info: true  },
+  { d: 80,  ok: 'OK', text: 'Started resume.service',                                         info: true  },
+  { d: 100, ok: 'OK', text: 'Started projects.target · 8 unit(s)',                            info: true  },
+  { d: 80,  ok: 'OK', text: 'Started experience.timer',                                        info: true  },
+  { d: 70,  ok: 'OK', text: 'Started stack.htop · 12 procs',                                  info: true  },
+  { d: 70,  ok: 'OK', text: 'Started now.stream',                                             info: true  },
+  { d: 50,  ok: 'OK', text: 'Started contact.daemon',                                         info: true  },
+  { d: 90,  ok: '··', text: 'Reaching recruiters.local … welcome',                            info: false },
 ];
 
 function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
+  const { identity } = useContent();
+  const BOOT_LINES = bootLines(identity.handle);
   const [step, setStep] = useState(0);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
@@ -52,7 +55,7 @@ function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
   if (skip) return null;
   return (
     <div style={{ padding: '22px 16px 4px', fontSize: 13 }}>
-      <div style={{ color: 'var(--t-dim)', marginBottom: 8 }}>booting arran@ava · press any key to skip</div>
+      <div style={{ color: 'var(--t-dim)', marginBottom: 8 }}>booting {identity.handle} · press any key to skip</div>
       {BOOT_LINES.slice(0, step).map((l, k) => (
         <div key={k} style={{ display: 'flex', gap: 14, alignItems: 'baseline', padding: '2px 0', lineHeight: 1.4 }}>
           <span style={{ color: l.ok === 'OK' ? 'var(--t-ok)' : 'var(--t-accent)', width: 50, flexShrink: 0 }}>
@@ -66,6 +69,7 @@ function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
 }
 
 function StatusBarTop() {
+  const { identity } = useContent();
   const [time, setTime] = useState('');
   useEffect(() => {
     const update = () => setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
@@ -87,7 +91,7 @@ function StatusBarTop() {
         <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, var(--t-ok) 70%, transparent)' }} />
       </div>
       <div style={{ flex: 1, textAlign: 'center', color: 'var(--t-dim)' }}>
-        arran@ava ~ /portfolio · zsh ·{' '}
+        {identity.handle} ~ /portfolio · zsh ·{' '}
         <span style={{ color: 'var(--t-accent)' }}>v3.1.4</span>
       </div>
       <div style={{ color: 'var(--t-dim)' }}>{time}</div>

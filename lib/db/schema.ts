@@ -11,7 +11,6 @@ export const identity = pgTable('identity', {
   github:    text('github').notNull(),
   linkedin:  text('linkedin').notNull(),
   readcv:    text('readcv').notNull(),
-  pgp:       text('pgp').notNull(),
   resumeUrl: text('resume_url'),
   avatarUrl: text('avatar_url'),
   bio:       text('bio').notNull().default(''),

@@ -11,53 +11,39 @@ export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?
   const { identity } = useContent();
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
-      <div className="hero-grid">
-        <div>
-          <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
-            {identity.role.split('·').map((part, i) => (
-              <span key={i}>
-                {i > 0 && <><br /><span style={{ color: 'var(--t-fg)' }}>+ </span></>}
-                <span style={{ color: i === 0 ? 'var(--t-accent)' : 'var(--t-fg)' }}>{part.trim().toLowerCase()}</span>
-              </span>
-            ))}
-            <BlinkCursor />
-          </h1>
-          <p style={{ marginTop: 18, maxWidth: 640, color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', lineHeight: 1.6 }}>
-            {identity.bio}
-          </p>
-          <div style={{ marginTop: 22, display: 'flex', gap: 22, flexWrap: 'wrap', fontSize: 13 }}>
-            {[
-              ['cat', 'resume.pdf'],
-              ['ssh', identity.email],
-              ['gh', 'follow ava'],
-            ].map(([c, t], i) => (
-              <span key={i} style={{ whiteSpace: 'nowrap' }}>
-                <span style={{ color: 'var(--t-dim)' }}>$ </span>
-                <span style={{ color: 'var(--t-accent)' }}>{c}</span>
-                <span> {t}</span>
-              </span>
-            ))}
-          </div>
-
-          {banner && identity.stats.length > 0 && (
-            <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-              {identity.stats.map((s) => (
-                <BoxFrame key={s.k} title={s.k}>
-                  <div style={{ fontSize: 28, color: 'var(--t-accent)' }}>{s.v}</div>
-                  <div style={{ fontSize: 11, color: 'var(--t-dim)' }}>{s.d}</div>
-                </BoxFrame>
-              ))}
-            </div>
-          )}
+      <div>
+        <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
+          {identity.role.split('·').map((part, i) => (
+            <span key={i}>
+              {i > 0 && <><br /><span style={{ color: 'var(--t-fg)' }}>+ </span></>}
+              <span style={{ color: i === 0 ? 'var(--t-accent)' : 'var(--t-fg)' }}>{part.trim().toLowerCase()}</span>
+            </span>
+          ))}
+        </h1>
+        <p style={{ marginTop: 18, maxWidth: 640, color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', lineHeight: 1.6 }}>
+          {identity.bio}
+        </p>
+        <div style={{ marginTop: 22, display: 'flex', gap: 22, flexWrap: 'wrap', fontSize: 13 }}>
+          {[
+            ['cat', 'resume.pdf'],
+            ['ssh', identity.email],
+            ['gh', 'follow ava'],
+          ].map(([c, t], i) => (
+            <span key={i} style={{ whiteSpace: 'nowrap' }}>
+              <span style={{ color: 'var(--t-dim)' }}>$ </span>
+              <span style={{ color: 'var(--t-accent)' }}>{c}</span>
+              <span> {t}</span>
+            </span>
+          ))}
         </div>
-
-        {identity.avatarUrl && (
-          <div className="t-portrait-wrap">
-            <div className="t-portrait-cap">~/portrait.jpg</div>
-            <div className="t-portrait-inner">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={identity.avatarUrl} alt="portrait" />
-            </div>
+        {banner && identity.stats.length > 0 && (
+          <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            {identity.stats.map((s) => (
+              <BoxFrame key={s.k} title={s.k}>
+                <div style={{ fontSize: 28, color: 'var(--t-accent)' }}>{s.v}</div>
+                <div style={{ fontSize: 11, color: 'var(--t-dim)' }}>{s.d}</div>
+              </BoxFrame>
+            ))}
           </div>
         )}
       </div>
@@ -321,15 +307,16 @@ export function ContactSection() {
         <div>
           <BoxFrame title="LINKS">
             {([
-              ['github',     identity.github,   '↗'],
-              ['linkedin',   identity.linkedin, '↗'],
-              ['read.cv',    identity.readcv,   '↗'],
-              ['resume.pdf', 'download',         '↓'],
-              ['pgp',        identity.pgp,       '' ],
-            ] as [string, string, string][]).map(([k, v, a]) => (
+              ['github',     identity.github,   '↗', identity.github   || null],
+              ['linkedin',   identity.linkedin, '↗', identity.linkedin || null],
+              ['read.cv',    identity.readcv,   '↗', identity.readcv   || null],
+              ...(identity.resumeUrl ? [['resume.pdf', 'download', '↓', identity.resumeUrl]] : []),
+            ] as [string, string, string, string | null][]).map(([k, v, a, href]) => (
               <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
                 <span style={{ color: 'var(--t-dim)' }}>{k}</span>
-                <span>{v} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>
+                {href
+                  ? <a href={href} target="_blank" rel="noopener noreferrer">{v.replace(/^https?:\/\//, '')} <span style={{ color: 'var(--t-accent)' }}>{a}</span></a>
+                  : <span>{v} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>}
               </div>
             ))}
           </BoxFrame>
