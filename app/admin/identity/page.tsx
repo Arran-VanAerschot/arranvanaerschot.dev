@@ -18,9 +18,7 @@ async function saveIdentity(formData: FormData) {
     email:     String(formData.get('email')    ?? ''),
     github:    String(formData.get('github')   ?? ''),
     linkedin:  String(formData.get('linkedin') ?? ''),
-    readcv:    String(formData.get('readcv')   ?? ''),
     resumeUrl: formData.get('resumeUrl') ? String(formData.get('resumeUrl')) : null,
-    avatarUrl: formData.get('avatarUrl') ? String(formData.get('avatarUrl')) : null,
     bio:       String(formData.get('bio')      ?? ''),
     stats:     [0,1,2,3].map(i => ({
       k: String(formData.get(`sk${i}`) ?? '').trim(),
@@ -63,9 +61,7 @@ export default async function IdentityPage({ searchParams }: { searchParams: Pro
           {F('email',     'Email',       id?.email     ?? '', 'email')}
           {F('github',    'GitHub',      id?.github    ?? '')}
           {F('linkedin',  'LinkedIn',    id?.linkedin  ?? '')}
-          {F('readcv',    'Read.cv',     id?.readcv    ?? '')}
           {F('resumeUrl', 'Resume URL',  id?.resumeUrl ?? '')}
-          {F('avatarUrl', 'Avatar image URL', id?.avatarUrl ?? '')}
         </div>
         <div style={A.card}>
           <h2 style={A.h2}>Bio</h2>
