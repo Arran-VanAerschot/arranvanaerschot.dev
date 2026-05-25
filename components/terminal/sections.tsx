@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile } from './components';
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
@@ -150,21 +151,26 @@ function ProjectsTable({ items, toggle, arrow }: {
         <span>desc</span>
         <span onClick={() => toggle('stars')} style={{ textAlign: 'right', cursor: 'pointer' }}>★{arrow('stars')}</span>
       </div>
-      {items.map((p, i) => (
-        <div key={p.id} className="t-row-hover"
-          style={{ display: 'grid', gridTemplateColumns: grid, gap: 12, padding: '8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', alignItems: 'center' }}>
-          <span style={{ color: 'var(--t-dim)' }}>{String(i + 1).padStart(2, '0')}</span>
-          <span>
-            <span style={{ color: 'var(--t-accent)' }}>./</span>
-            <span style={{ textDecoration: 'underline', textDecorationStyle: 'dashed', textUnderlineOffset: 3, textDecorationColor: 'var(--t-border)' }}>{p.id}</span>
-          </span>
-          <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
-          <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
-          <span style={{ color: 'var(--t-info)', fontSize: 11 }}>{p.stack.join(',')}</span>
-          <span style={{ color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))', fontSize: 12 }}>{p.tagline}</span>
-          <span style={{ textAlign: 'right', color: 'var(--t-ok)' }}>{p.stars}</span>
-        </div>
-      ))}
+      {items.map((p, i) => {
+        const row = (
+          <div className="t-row-hover"
+            style={{ display: 'grid', gridTemplateColumns: grid, gap: 12, padding: '8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', alignItems: 'center', cursor: p.published ? 'pointer' : 'default' }}>
+            <span style={{ color: 'var(--t-dim)' }}>{String(i + 1).padStart(2, '0')}</span>
+            <span>
+              <span style={{ color: 'var(--t-accent)' }}>./</span>
+              <span style={{ textDecoration: 'underline', textDecorationStyle: p.published ? 'solid' : 'dashed', textUnderlineOffset: 3, textDecorationColor: p.published ? 'var(--t-accent)' : 'var(--t-border)' }}>{p.id}</span>
+            </span>
+            <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
+            <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
+            <span style={{ color: 'var(--t-info)', fontSize: 11 }}>{p.stack.join(',')}</span>
+            <span style={{ color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))', fontSize: 12 }}>{p.tagline}</span>
+            <span style={{ textAlign: 'right', color: 'var(--t-ok)' }}>{p.stars}</span>
+          </div>
+        );
+        return p.published
+          ? <Link key={p.id} href={`/projects/${p.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'contents' }}>{row}</Link>
+          : row;
+      })}
       {items.length === 0 && <div style={{ padding: 14, color: 'var(--t-dim)' }}>no matches.</div>}
     </div>
   );
@@ -173,16 +179,21 @@ function ProjectsTable({ items, toggle, arrow }: {
 function ProjectsCards({ items }: { items: ContentProject[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-      {items.map((p) => (
-        <BoxFrame key={p.id} title={`${p.kind}/${p.y}`}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div style={{ color: 'var(--t-accent)', fontSize: 18 }}>./{p.id}</div>
-            <div style={{ color: 'var(--t-ok)', fontSize: 12 }}>★ {p.stars}</div>
-          </div>
-          <div style={{ marginTop: 8, fontSize: 12, color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))' }}>{p.tagline}</div>
-          <div style={{ marginTop: 14, color: 'var(--t-info)', fontSize: 11 }}>{p.stack.join(' · ')}</div>
-        </BoxFrame>
-      ))}
+      {items.map((p) => {
+        const card = (
+          <BoxFrame title={`${p.kind}/${p.y}`} style={{ cursor: p.published ? 'pointer' : 'default' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div style={{ color: 'var(--t-accent)', fontSize: 18 }}>./{p.id}</div>
+              <div style={{ color: 'var(--t-ok)', fontSize: 12 }}>★ {p.stars}</div>
+            </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))' }}>{p.tagline}</div>
+            <div style={{ marginTop: 14, color: 'var(--t-info)', fontSize: 11 }}>{p.stack.join(' · ')}</div>
+          </BoxFrame>
+        );
+        return p.published
+          ? <Link key={p.id} href={`/projects/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>{card}</Link>
+          : card;
+      })}
     </div>
   );
 }
@@ -190,19 +201,24 @@ function ProjectsCards({ items }: { items: ContentProject[] }) {
 function ProjectsGitLog({ items }: { items: ContentProject[] }) {
   return (
     <div>
-      {items.map((p) => (
-        <div key={p.id} className="t-row-hover"
-          style={{ display: 'block', padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-            <span style={{ color: 'var(--t-accent)', fontSize: 11 }}>{(p.id + p.y).slice(0, 8)}</span>
-            <span style={{ color: 'var(--t-dim)' }}>({p.y})</span>
-            <span style={{ color: 'var(--t-warn)', fontSize: 11 }}>[{p.kind}]</span>
-            <span style={{ color: 'var(--t-fg)' }}>{p.title} — {p.tagline}</span>
-            <span style={{ marginLeft: 'auto', color: 'var(--t-ok)' }}>★{p.stars}</span>
+      {items.map((p) => {
+        const row = (
+          <div className="t-row-hover"
+            style={{ display: 'block', padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', cursor: p.published ? 'pointer' : 'default' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+              <span style={{ color: 'var(--t-accent)', fontSize: 11 }}>{(p.id + p.y).slice(0, 8)}</span>
+              <span style={{ color: 'var(--t-dim)' }}>({p.y})</span>
+              <span style={{ color: 'var(--t-warn)', fontSize: 11 }}>[{p.kind}]</span>
+              <span style={{ color: 'var(--t-fg)' }}>{p.title} — {p.tagline}</span>
+              <span style={{ marginLeft: 'auto', color: 'var(--t-ok)' }}>★{p.stars}</span>
+            </div>
+            <div style={{ paddingLeft: 16, marginTop: 4, fontSize: 11, color: 'var(--t-info)' }}>{p.stack.join(' / ')}</div>
           </div>
-          <div style={{ paddingLeft: 16, marginTop: 4, fontSize: 11, color: 'var(--t-info)' }}>{p.stack.join(' / ')}</div>
-        </div>
-      ))}
+        );
+        return p.published
+          ? <Link key={p.id} href={`/projects/${p.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>{row}</Link>
+          : row;
+      })}
     </div>
   );
 }
