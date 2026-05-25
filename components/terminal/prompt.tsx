@@ -92,6 +92,13 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
       return out;
     }
     case 'cat': {
+      if (arg === 'resume.pdf' || arg === 'resume') {
+        const url = content.identity.resumeUrl;
+        if (!url) { push('out', 'resume.pdf not yet uploaded · check back soon'); return out; }
+        push('out', `opening ${url} ...`);
+        setTimeout(() => window.open(url, '_blank'), 200);
+        return out;
+      }
       const note = content.notes.find((n) => n.slug === arg);
       if (note) {
         push('info', `── ${note.title} (${note.date}) ──`);
