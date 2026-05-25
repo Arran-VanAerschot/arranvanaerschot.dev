@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame } from './components';
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
@@ -264,18 +264,23 @@ type SpotifyState = { isPlaying: false } | { isPlaying: true; title: string; art
 
 function useSpotify() {
   const [state, setState] = useState<SpotifyState>({ isPlaying: false });
+  const isPlayingRef = useRef(false);
   useEffect(() => {
     let cancelled = false;
+    let id: ReturnType<typeof setTimeout>;
     async function poll() {
       try {
         const res = await fetch('/api/spotify');
-        const data = await res.json();
-        if (!cancelled) setState(data);
+        const data: SpotifyState = await res.json();
+        if (!cancelled) {
+          isPlayingRef.current = data.isPlaying;
+          setState(data);
+        }
       } catch { /* ignore */ }
+      if (!cancelled) id = setTimeout(poll, isPlayingRef.current ? 5000 : 10000);
     }
     poll();
-    const id = setInterval(poll, 30000);
-    return () => { cancelled = true; clearInterval(id); };
+    return () => { cancelled = true; clearTimeout(id); };
   }, []);
   return state;
 }

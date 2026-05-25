@@ -20,7 +20,7 @@ export async function GET() {
     const token = await getAccessToken();
     const res = await fetch(NOW_PLAYING_URL, {
       headers: { Authorization: `Bearer ${token}` },
-      next: { revalidate: 30 },
+      cache: 'no-store',
     });
 
     if (res.status === 204 || res.status > 400) {
