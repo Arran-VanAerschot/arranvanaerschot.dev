@@ -1,27 +1,32 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { Prompt, BlinkCursor } from './components';
-import { TD } from './data';
-import type { OutputLine, HistoryEntry, SetTweak } from './types';
+import { useContent } from './content-context';
+import type { Content, OutputLine, HistoryEntry, SetTweak } from './types';
 
 const CMD_HELP: [string, string][] = [
-  ['help',           'show this list'],
-  ['whoami',         'short bio'],
-  ['ls projects',    'list projects'],
-  ['cat <project>',  'read a project blurb · try `cat ledger`'],
-  ['cd <section>',   'jump to section · hero/projects/work/stack/now/contact'],
-  ['skills',         'list stack'],
-  ['now',            'what i am up to'],
-  ['contact',        'how to reach me'],
-  ['resume',         'open resume.pdf'],
-  ['gh, in, mail',   'open github / linkedin / email'],
-  ['theme <name>',   'amber|green|cyan|magenta|paper'],
-  ['density <name>', 'compact|comfy|roomy'],
-  ['banner',         'reprint the boot banner'],
-  ['clear',          'clear scrollback'],
+  ['help',              'show this list'],
+  ['whoami',            'short bio'],
+  ['ls projects',       'list projects'],
+  ['ls notes',          'list writing'],
+  ['cat <project>',     'read a project blurb · try `cat ledger`'],
+  ['cat <note>',        'read a note summary'],
+  ['open <project>',    'open case study (if published)'],
+  ['open <note>',       'open a note'],
+  ['cd <section>',      'jump to section · hero/projects/work/stack/now/contact'],
+  ['skills',            'list stack'],
+  ['now',               'what i am up to'],
+  ['contact',           'how to reach me'],
+  ['resume',            'open resume.pdf'],
+  ['gh, in, mail',      'open github / linkedin / email'],
+  ['theme <name>',      'amber|green|cyan|magenta|paper'],
+  ['density <name>',    'compact|comfy|roomy'],
+  ['banner',            'reprint the boot banner'],
+  ['clear',             'clear scrollback'],
   ['date · uptime · echo', 'the usual suspects'],
-  ['sudo …',         "you don't have those powers"],
+  ['sudo …',            "you don't have those powers"],
 ];
 
 const SECTION_MAP: Record<string, string> = {
@@ -35,9 +40,11 @@ const ALL_CMDS = ['help', 'whoami', 'ls', 'cat', 'open', 'cd', 'skills', 'now', 
 
 interface InterpretCtx {
   go: (id: string) => boolean;
+  navigate: (url: string) => void;
   setTweak: SetTweak;
   reboot: () => void;
   clear: () => void;
+  content: Content;
 }
 
 function scrollTo(id: string): boolean {
@@ -49,6 +56,7 @@ function scrollTo(id: string): boolean {
 }
 
 function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
+  const { content } = ctx;
   const line = raw.trim();
   if (!line) return null;
   const [cmd, ...rest] = line.split(/\s+/);
@@ -60,36 +68,61 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
     case 'help':
     case '?': {
       push('info', 'AVAILABLE COMMANDS');
-      CMD_HELP.forEach(([c, d]) => push('help', `  ${c.padEnd(20)} ${d}`));
+      CMD_HELP.forEach(([c, d]) => push('help', `  ${c.padEnd(22)} ${d}`));
       return out;
     }
     case 'whoami': {
-      push('out', `${TD.identity.name} · ${TD.identity.role}`);
-      push('out', `${TD.identity.loc} · ${TD.identity.open}`);
+      push('out', `${content.identity.name} · ${content.identity.role}`);
+      push('out', `${content.identity.loc} · ${content.identity.open}`);
       ctx.go('sec-hero');
       return out;
     }
     case 'ls': {
       if (arg.startsWith('proj')) {
-        TD.projects.forEach((p) => push('out', `${p.id.padEnd(12)} ${String(p.y).padEnd(6)} ${p.kind.padEnd(8)} ${p.tagline}`));
+        content.projects.forEach((p) => push('out', `${p.id.padEnd(14)} ${String(p.y).padEnd(6)} ${p.kind.padEnd(10)} ${p.tagline}`));
+      } else if (arg === 'notes' || arg.startsWith('notes')) {
+        if (content.notes.length === 0) {
+          push('dim', 'no notes yet.');
+        } else {
+          content.notes.forEach((n) => push('out', `${n.slug.padEnd(24)} ${n.date}  ${n.title}`));
+        }
       } else {
-        push('out', 'about/  projects/  experience/  stack/  now/  contact/  resume.pdf');
+        push('out', 'about/  projects/  experience/  stack/  now/  contact/  notes/  resume.pdf');
       }
       return out;
     }
     case 'cat': {
-      const p = TD.projects.find((x) => x.id === arg);
-      if (!p) { push('err', `cat: ${arg || '<missing>'}: no such project`); return out; }
+      const note = content.notes.find((n) => n.slug === arg);
+      if (note) {
+        push('info', `── ${note.title} (${note.date}) ──`);
+        push('out', note.summary);
+        if (note.tags.length) push('dim', `tags: ${note.tags.join(', ')}`);
+        push('dim', `→ open ${note.slug}  to read`);
+        return out;
+      }
+      const p = content.projects.find((x) => x.id === arg);
+      if (!p) { push('err', `cat: ${arg || '<missing>'}: no such file`); return out; }
       push('info', `── ${p.title.toUpperCase()} (${p.y}) ──`);
       push('out', p.tagline);
       push('out', '');
       push('out', p.desc);
       push('out', '');
       push('dim', `stack: ${p.stack.join(', ')} · ★ ${p.stars}`);
+      if (p.published) push('dim', `→ open ${p.id}  to read case study`);
       return out;
     }
     case 'open': {
-      push('err', `open: ${arg || '<missing>'}: case studies coming soon`);
+      const note = content.notes.find((n) => n.slug === arg);
+      if (note) {
+        push('out', `opening /notes/${note.slug} ...`);
+        setTimeout(() => ctx.navigate('/notes/' + note.slug), 150);
+        return out;
+      }
+      const p = content.projects.find((x) => x.id === arg);
+      if (!p) { push('err', `open: ${arg || '<missing>'}: no such project or note`); return out; }
+      if (!p.published) { push('err', `open: ${arg}: case study not yet published`); return out; }
+      push('out', `opening /projects/${arg} ...`);
+      setTimeout(() => ctx.navigate('/projects/' + arg), 150);
       return out;
     }
     case 'cd': {
@@ -103,17 +136,20 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
     case 'now': { ctx.go('sec-now'); return null; }
     case 'contact': { ctx.go('sec-contact'); return null; }
     case 'resume': {
-      push('out', 'resume.pdf not yet uploaded · check back soon');
+      const url = content.identity.resumeUrl;
+      if (!url) { push('out', 'resume.pdf not yet uploaded · check back soon'); return out; }
+      push('out', `opening ${url} ...`);
+      setTimeout(() => window.open(url, '_blank'), 200);
       return out;
     }
     case 'gh':
-    case 'github': { push('out', `→ ${TD.identity.github}`); return out; }
+    case 'github': { push('out', `→ ${content.identity.github}`); return out; }
     case 'in':
-    case 'linkedin': { push('out', `→ ${TD.identity.linkedin}`); return out; }
+    case 'linkedin': { push('out', `→ ${content.identity.linkedin}`); return out; }
     case 'mail':
     case 'email': {
-      push('out', `→ mailto:${TD.identity.email}`);
-      setTimeout(() => { window.location.href = 'mailto:' + TD.identity.email; }, 200);
+      push('out', `→ mailto:${content.identity.email}`);
+      setTimeout(() => { window.location.href = 'mailto:' + content.identity.email; }, 200);
       return out;
     }
     case 'theme': {
@@ -135,14 +171,14 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
     case 'date': { push('out', new Date().toString()); return out; }
     case 'uptime': { push('out', `${new Date().toLocaleTimeString()}  up 14 days,  load average: 0.42, 0.39, 0.31`); return out; }
     case 'echo': { push('out', rest.join(' ')); return out; }
-    case 'sudo': { push('err', `${TD.identity.handle.split('@')[0]} is not in the sudoers file. This incident will be reported.`); return out; }
+    case 'sudo': { push('err', `${content.identity.handle.split('@')[0]} is not in the sudoers file. This incident will be reported.`); return out; }
     case 'rm': { push('err', 'rm: i am not falling for that one'); return out; }
     case 'man': {
       if (arg === 'arran') {
         push('info', 'ARRAN(1)                  PORTFOLIO MANUAL                  ARRAN(1)');
         push('out', '');
         push('out', 'NAME');
-        push('out', '       arran — junior software engineer, automation engineer');
+        push('out', `       ${content.identity.name} — ${content.identity.role.toLowerCase()}`);
         push('out', '');
         push('out', 'SYNOPSIS');
         push('out', '       hire(arran) -> ships(quietly)');
@@ -150,7 +186,7 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
         push('out', 'DESCRIPTION');
         push('out', '       Writes backend services in .NET. Automates the boring parts.');
         push('out', '       Brings a React UI along when one is needed. Currently in');
-        push('out', '       Brussels — open Q3 2026, contract or perm, remote EU.');
+        push('out', `       ${content.identity.loc} — ${content.identity.open}.`);
         push('out', '');
         push('out', 'SEE ALSO');
         push('out', '       projects(1), experience(1), contact(1)');
@@ -172,6 +208,8 @@ interface TerminalPromptProps {
 }
 
 export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
+  const content = useContent();
+  const router = useRouter();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [draft, setDraft] = useState('');
   const [stack, setStack] = useState<string[]>([]);
@@ -182,10 +220,12 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
 
   const ctx = useMemo<InterpretCtx>(() => ({
     go: scrollTo,
+    navigate: (url: string) => router.push(url),
     setTweak,
     reboot,
     clear: () => setHistory([]),
-  }), [setTweak, reboot]);
+    content,
+  }), [setTweak, reboot, content, router]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -211,8 +251,9 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
       setHint(m ? m.slice(head.length) : '');
     } else if (head === 'cat' || head === 'open') {
       const last = rest.join(' ');
-      const p = TD.projects.find((x) => x.id.startsWith(last) && x.id !== last);
-      setHint(p ? p.id.slice(last.length) : '');
+      const p = content.projects.find((x) => x.id.startsWith(last) && x.id !== last);
+      const n = content.notes.find((x) => x.slug.startsWith(last) && x.slug !== last);
+      setHint(p ? p.id.slice(last.length) : n ? n.slug.slice(last.length) : '');
     } else if (head === 'cd') {
       const last = rest.join(' ');
       const keys = Object.keys(SECTION_MAP);
@@ -221,7 +262,7 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
     } else {
       setHint('');
     }
-  }, [draft]);
+  }, [draft, content]);
 
   const submit = useCallback((e?: React.FormEvent) => {
     e?.preventDefault();

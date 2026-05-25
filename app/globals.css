@@ -69,3 +69,21 @@ html, body {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
 }
+
+/* MDX rendered content (notes + case studies) */
+.mdx-content { line-height: 1.7; color: #d4d3cc; }
+.mdx-content h1, .mdx-content h2, .mdx-content h3 { color: #e8a13a; font-weight: 500; margin: 2em 0 0.6em; }
+.mdx-content h1 { font-size: 1.5em; }
+.mdx-content h2 { font-size: 1.2em; border-bottom: 1px solid #2a2b27; padding-bottom: 0.3em; }
+.mdx-content h3 { font-size: 1em; color: #6ab0b3; }
+.mdx-content p  { margin: 1em 0; }
+.mdx-content a  { color: #e8a13a; text-underline-offset: 3px; }
+.mdx-content code { background: #1a1b1c; padding: 1px 6px; border-radius: 3px; font-size: 0.9em; color: #7eb87e; }
+.mdx-content pre { background: #1a1b1c; border: 1px solid #2a2b27; padding: 16px; overflow-x: auto; margin: 1.5em 0; }
+.mdx-content pre code { background: none; padding: 0; color: #d4d3cc; }
+.mdx-content blockquote { border-left: 3px solid #e8a13a; padding-left: 16px; margin: 1.5em 0; color: #5d5e57; }
+.mdx-content ul, .mdx-content ol { padding-left: 1.5em; margin: 1em 0; }
+.mdx-content li { margin: 0.4em 0; }
+.mdx-content hr { border: none; border-top: 1px solid #2a2b27; margin: 2em 0; }
+.mdx-content strong { color: #e8a13a; font-weight: 600; }
+.mdx-content em { color: #c97b9d; }

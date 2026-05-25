@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame } from './components';
-import { TD } from './data';
+import { useContent } from './content-context';
+import type { ContentProject } from './types';
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,7 @@ const ASCII_LINES = [
 ];
 
 export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean }) {
+  const { identity } = useContent();
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
       <div style={{ display: 'grid', gridTemplateColumns: ascii ? 'minmax(0, 320px) 1fr' : '1fr', gap: 36, alignItems: 'start' }}>
@@ -41,7 +43,7 @@ export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean
           <div style={{ marginTop: 22, display: 'flex', gap: 22, flexWrap: 'wrap', fontSize: 13 }}>
             {[
               ['cat', 'resume.pdf'],
-              ['ssh', TD.identity.email],
+              ['ssh', identity.email],
               ['gh', 'follow ava'],
             ].map(([c, t], i) => (
               <span key={i} style={{ whiteSpace: 'nowrap' }}>
@@ -78,11 +80,12 @@ export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean
 type SortKey = 'id' | 'kind' | 'y' | 'stars';
 
 export function ProjectsSection({ variant }: { variant: string }) {
+  const { projects } = useContent();
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('y');
   const [dir, setDir] = useState<1 | -1>(-1);
 
-  const filtered = TD.projects.filter((p) =>
+  const filtered = projects.filter((p) =>
     !query
     || p.id.includes(query.toLowerCase())
     || p.stack.join(',').includes(query.toLowerCase())
@@ -114,7 +117,7 @@ export function ProjectsSection({ variant }: { variant: string }) {
           spellCheck={false}
           style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--t-fg)', font: 'inherit' }}
         />
-        <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{filtered.length}/{TD.projects.length}</span>
+        <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{filtered.length}/{projects.length}</span>
       </div>
 
       {variant === 'cards'  ? <ProjectsCards  items={sorted} /> :
@@ -124,10 +127,8 @@ export function ProjectsSection({ variant }: { variant: string }) {
   );
 }
 
-type ProjectItem = typeof TD.projects[number];
-
 function ProjectsTable({ items, toggle, arrow }: {
-  items: ProjectItem[];
+  items: ContentProject[];
   toggle: (col: SortKey) => void;
   arrow: (col: SortKey) => string;
 }) {
@@ -147,7 +148,10 @@ function ProjectsTable({ items, toggle, arrow }: {
         <div key={p.id} className="t-row-hover"
           style={{ display: 'grid', gridTemplateColumns: grid, gap: 12, padding: '8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', alignItems: 'center' }}>
           <span style={{ color: 'var(--t-dim)' }}>{String(i + 1).padStart(2, '0')}</span>
-          <span><span style={{ color: 'var(--t-accent)' }}>./</span><span style={{ textDecoration: 'underline', textDecorationStyle: 'dashed', textUnderlineOffset: 3, textDecorationColor: 'var(--t-border)' }}>{p.id}</span></span>
+          <span>
+            <span style={{ color: 'var(--t-accent)' }}>./</span>
+            <span style={{ textDecoration: 'underline', textDecorationStyle: 'dashed', textUnderlineOffset: 3, textDecorationColor: 'var(--t-border)' }}>{p.id}</span>
+          </span>
           <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
           <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
           <span style={{ color: 'var(--t-info)', fontSize: 11 }}>{p.stack.join(',')}</span>
@@ -160,7 +164,7 @@ function ProjectsTable({ items, toggle, arrow }: {
   );
 }
 
-function ProjectsCards({ items }: { items: ProjectItem[] }) {
+function ProjectsCards({ items }: { items: ContentProject[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
       {items.map((p) => (
@@ -177,7 +181,7 @@ function ProjectsCards({ items }: { items: ProjectItem[] }) {
   );
 }
 
-function ProjectsGitLog({ items }: { items: ProjectItem[] }) {
+function ProjectsGitLog({ items }: { items: ContentProject[] }) {
   return (
     <div>
       {items.map((p) => (
@@ -200,10 +204,11 @@ function ProjectsGitLog({ items }: { items: ProjectItem[] }) {
 // ── Experience ────────────────────────────────────────────────────────────────
 
 export function ExperienceSection() {
+  const { experience } = useContent();
   return (
     <Section id="sec-experience" label="03 Experience" path="~" cmd="git log --oneline --branch=career">
       <div>
-        {TD.experience.map((e, i) => (
+        {experience.map((e, i) => (
           <div key={i} style={{ borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)', padding: '14px 0', display: 'grid', gridTemplateColumns: '160px 1fr', gap: 28 }}>
             <div>
               <div style={{ color: 'var(--t-accent)', fontSize: 12 }}>{e.when}</div>
@@ -233,34 +238,35 @@ export function ExperienceSection() {
 // ── Stack / Skills ────────────────────────────────────────────────────────────
 
 export function StackSection() {
+  const { skills } = useContent();
   const [history, setHistory] = useState<number[][]>(() =>
-    TD.skills.map(() => Array.from({ length: 16 }, () => 30 + Math.random() * 60))
+    skills.map(() => Array.from({ length: 16 }, () => 30 + Math.random() * 60))
   );
 
   useEffect(() => {
     const i = setInterval(() => {
       setHistory((h) => h.map((arr, idx) => {
-        const target = TD.skills[idx].cpu;
+        const target = skills[idx]?.cpu ?? 50;
         const next = Math.max(2, Math.min(99, target + (Math.random() - 0.5) * 18));
         return [...arr.slice(1), next];
       }));
     }, 900);
     return () => clearInterval(i);
-  }, []);
+  }, [skills]);
 
   return (
     <Section id="sec-stack" label="04 Stack" path="~" cmd="htop --sort cpu">
       <div style={{ display: 'grid', gridTemplateColumns: '120px 80px 130px 1fr', gap: 12, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         <span>process</span><span>cpu%</span><span>load</span><span>cmd</span>
       </div>
-      {TD.skills.map((s, i) => (
+      {skills.map((s, i) => (
         <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 80px 130px 1fr', gap: 12, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
           <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
           <span>
             <CharBar pct={s.cpu} width={10} />
             <span style={{ color: 'var(--t-dim)', fontSize: 11, marginLeft: 4 }}>{s.cpu}</span>
           </span>
-          <span><Sparkline values={history[i]} width={14} /></span>
+          <span><Sparkline values={history[i] ?? []} width={14} /></span>
           <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
         </div>
       ))}
@@ -278,6 +284,7 @@ const TAG_COLORS: Record<string, string> = {
 };
 
 export function NowSection() {
+  const { now } = useContent();
   const [tick, setTick] = useState(0);
   useEffect(() => {
     const i = setInterval(() => setTick((t) => t + 1), 4000);
@@ -286,8 +293,8 @@ export function NowSection() {
 
   return (
     <Section id="sec-now" label="05 Now" path="~" cmd="tail -f ~/now.log">
-      {TD.now.map((n, i) => {
-        const ts = new Date(Date.now() - (TD.now.length - i) * 60000 - tick * 1000)
+      {now.map((n, i) => {
+        const ts = new Date(Date.now() - (now.length - i) * 60000 - tick * 1000)
           .toISOString().replace('T', ' ').slice(0, 19);
         return (
           <div key={i} style={{ padding: '4px 0', fontSize: 13 }}>
@@ -305,6 +312,7 @@ export function NowSection() {
 // ── Contact ───────────────────────────────────────────────────────────────────
 
 export function ContactSection() {
+  const { identity } = useContent();
   return (
     <Section id="sec-contact" label="06 Contact" path="~" cmd="cat contact.txt">
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
@@ -315,19 +323,19 @@ export function ContactSection() {
             <span style={{ color: 'var(--t-accent)' }}> Q3 2026</span>. remote EU or Brussels.
           </div>
           <div style={{ marginTop: 18 }}>
-            <a href={`mailto:${TD.identity.email}`} style={{ color: 'var(--t-accent)', fontSize: 20, textDecoration: 'underline', textUnderlineOffset: 4 }}>
-              {TD.identity.email}
+            <a href={`mailto:${identity.email}`} style={{ color: 'var(--t-accent)', fontSize: 20, textDecoration: 'underline', textUnderlineOffset: 4 }}>
+              {identity.email}
             </a>
           </div>
         </div>
         <div>
           <BoxFrame title="LINKS">
             {([
-              ['github',     TD.identity.github,   '↗'],
-              ['linkedin',   TD.identity.linkedin, '↗'],
-              ['read.cv',    TD.identity.readcv,   '↗'],
-              ['resume.pdf', 'download (172kb)',    '↓'],
-              ['pgp',        TD.identity.pgp,       '' ],
+              ['github',     identity.github,   '↗'],
+              ['linkedin',   identity.linkedin, '↗'],
+              ['read.cv',    identity.readcv,   '↗'],
+              ['resume.pdf', 'download',         '↓'],
+              ['pgp',        identity.pgp,       '' ],
             ] as [string, string, string][]).map(([k, v, a]) => (
               <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
                 <span style={{ color: 'var(--t-dim)' }}>{k}</span>

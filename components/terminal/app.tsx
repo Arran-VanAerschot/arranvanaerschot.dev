@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, CSSProperties } from 'react';
+import Link from 'next/link';
 import { T_THEMES, T_FONTS, T_DENSITY } from './components';
 import { HeroSection, ProjectsSection, ExperienceSection, StackSection, NowSection, ContactSection } from './sections';
 import { TerminalPrompt } from './prompt';
@@ -196,12 +197,16 @@ export default function TerminalApp() {
         padding: '0 14px', background: 'color-mix(in oklab, var(--t-bg) 90%, #000 5%)',
         fontSize: 12, height: 30, alignItems: 'stretch',
       }}>
-        {(['~/portfolio', '~/projects', '~/notes', '+ new'] as const).map((tab, i) => (
-          <div key={tab} style={{
+        {([
+          { label: '~/portfolio', href: '/',       active: true  },
+          { label: '~/notes',     href: '/notes',  active: false },
+        ] as const).map(({ label, href, active }) => (
+          <Link key={label} href={href} style={{
             padding: '0 14px', display: 'flex', alignItems: 'center',
-            borderBottom: '2px solid ' + (i === 0 ? 'var(--t-accent)' : 'transparent'),
-            color: i === 0 ? 'var(--t-accent)' : 'var(--t-dim)',
-          }}>{tab}</div>
+            borderBottom: '2px solid ' + (active ? 'var(--t-accent)' : 'transparent'),
+            color: active ? 'var(--t-accent)' : 'var(--t-dim)',
+            textDecoration: 'none',
+          }}>{label}</Link>
         ))}
         <div style={{ flex: 1 }} />
         <div style={{ display: 'flex', alignItems: 'center', color: 'var(--t-dim)' }}>uptime 14d · 0 alerts · main ↑0</div>
