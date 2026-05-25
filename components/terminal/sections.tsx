@@ -30,15 +30,16 @@ export function HeroSection({ ascii, banner }: { ascii: boolean; banner: boolean
         )}
         <div>
           <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
-            <span style={{ color: 'var(--t-accent)' }}>junior software engineer</span>
-            <br />
-            <span>+ automation engineer</span>
+            {identity.role.split('·').map((part, i) => (
+              <span key={i}>
+                {i > 0 && <><br /><span style={{ color: 'var(--t-fg)' }}>+ </span></>}
+                <span style={{ color: i === 0 ? 'var(--t-accent)' : 'var(--t-fg)' }}>{part.trim().toLowerCase()}</span>
+              </span>
+            ))}
             <BlinkCursor />
           </h1>
           <p style={{ marginTop: 18, maxWidth: 640, color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', lineHeight: 1.6 }}>
-            I build backend services — mostly .NET, sometimes Go — wire up React/Next when a UI
-            is needed, and write a lot of glue around docker, postgres, and github actions.
-            Happiest in the gap between <em>&quot;this works&quot;</em> and <em>&quot;this is actually maintained.&quot;</em>
+            {identity.bio}
           </p>
           <div style={{ marginTop: 22, display: 'flex', gap: 22, flexWrap: 'wrap', fontSize: 13 }}>
             {[

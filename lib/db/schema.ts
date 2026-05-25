@@ -13,6 +13,7 @@ export const identity = pgTable('identity', {
   readcv:    text('readcv').notNull(),
   pgp:       text('pgp').notNull(),
   resumeUrl: text('resume_url'),
+  bio:       text('bio').notNull().default(''),
 });
 
 export const projects = pgTable('projects', {

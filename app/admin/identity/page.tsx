@@ -20,6 +20,7 @@ async function saveIdentity(formData: FormData) {
     readcv:    String(formData.get('readcv')   ?? ''),
     pgp:       String(formData.get('pgp')      ?? ''),
     resumeUrl: formData.get('resumeUrl') ? String(formData.get('resumeUrl')) : null,
+    bio:       String(formData.get('bio')      ?? ''),
   };
   await db.update(identity).set(data).where(eq(identity.id, 1));
   revalidatePath('/');
@@ -59,6 +60,13 @@ export default async function IdentityPage({ searchParams }: { searchParams: Pro
           {F('readcv',    'Read.cv',     id?.readcv    ?? '')}
           {F('pgp',       'PGP key ID',  id?.pgp       ?? '')}
           {F('resumeUrl', 'Resume URL',  id?.resumeUrl ?? '')}
+        </div>
+        <div style={A.card}>
+          <h2 style={A.h2}>Bio</h2>
+          <div style={A.field}>
+            <label style={A.label}>Short description (shown on homepage)</label>
+            <textarea name="bio" rows={4} defaultValue={id?.bio ?? ''} style={A.textarea} />
+          </div>
         </div>
         <button type="submit" style={A.btn}>Save identity</button>
       </form>
