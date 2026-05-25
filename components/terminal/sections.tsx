@@ -7,11 +7,12 @@ import type { ContentProject } from './types';
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-export function HeroSection({ banner }: { banner: boolean }) {
+export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?: boolean }) {
   const { identity } = useContent();
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
-      <div>
+      <div className="hero-grid">
+        <div>
           <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
             {identity.role.split('·').map((part, i) => (
               <span key={i}>
@@ -48,6 +49,17 @@ export function HeroSection({ banner }: { banner: boolean }) {
               ))}
             </div>
           )}
+        </div>
+
+        {identity.avatarUrl && (
+          <div className="t-portrait-wrap">
+            <div className="t-portrait-cap">~/portrait.jpg</div>
+            <div className="t-portrait-inner">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={identity.avatarUrl} alt="portrait" />
+            </div>
+          </div>
+        )}
       </div>
     </Section>
   );
@@ -225,7 +237,7 @@ export function StackSection() {
     const i = setInterval(() => {
       setHistory((h) => h.map((arr, idx) => {
         const target = skills[idx]?.cpu ?? 50;
-        const next = Math.max(2, Math.min(99, target + (Math.random() - 0.5) * 18));
+        const next = Math.round(Math.max(2, Math.min(99, target + (Math.random() - 0.5) * 18)));
         return [...arr.slice(1), next];
       }));
     }, 900);
@@ -234,17 +246,17 @@ export function StackSection() {
 
   return (
     <Section id="sec-stack" label="04 Stack" path="~" cmd="htop --sort cpu">
-      <div style={{ display: 'grid', gridTemplateColumns: '120px 80px 130px 1fr', gap: 12, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         <span>process</span><span>cpu%</span><span>load</span><span>cmd</span>
       </div>
       {skills.map((s, i) => (
-        <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 80px 130px 1fr', gap: 12, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
+        <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
           <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
-          <span>
-            <CharBar pct={s.cpu} width={10} />
-            <span style={{ color: 'var(--t-dim)', fontSize: 11, marginLeft: 4 }}>{s.cpu}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CharBar pct={s.cpu} width={14} />
+            <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
           </span>
-          <span><Sparkline values={history[i] ?? []} width={14} /></span>
+          <span><Sparkline values={history[i] ?? []} width={20} /></span>
           <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
         </div>
       ))}

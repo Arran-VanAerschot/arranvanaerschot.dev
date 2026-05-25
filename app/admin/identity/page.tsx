@@ -1,3 +1,4 @@
+import React from 'react';
 import { revalidatePath, unstable_noStore as noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -20,6 +21,7 @@ async function saveIdentity(formData: FormData) {
     readcv:    String(formData.get('readcv')   ?? ''),
     pgp:       String(formData.get('pgp')      ?? ''),
     resumeUrl: formData.get('resumeUrl') ? String(formData.get('resumeUrl')) : null,
+    avatarUrl: formData.get('avatarUrl') ? String(formData.get('avatarUrl')) : null,
     bio:       String(formData.get('bio')      ?? ''),
     stats:     [0,1,2,3].map(i => ({
       k: String(formData.get(`sk${i}`) ?? '').trim(),
@@ -65,6 +67,7 @@ export default async function IdentityPage({ searchParams }: { searchParams: Pro
           {F('readcv',    'Read.cv',     id?.readcv    ?? '')}
           {F('pgp',       'PGP key ID',  id?.pgp       ?? '')}
           {F('resumeUrl', 'Resume URL',  id?.resumeUrl ?? '')}
+          {F('avatarUrl', 'Avatar image URL', id?.avatarUrl ?? '')}
         </div>
         <div style={A.card}>
           <h2 style={A.h2}>Bio</h2>
@@ -83,11 +86,11 @@ export default async function IdentityPage({ searchParams }: { searchParams: Pro
             {[0,1,2,3].map(i => {
               const s = id?.stats?.[i];
               return (
-                <>
-                  <input key={`k${i}`} name={`sk${i}`} defaultValue={s?.k ?? ''} placeholder="e.g. YEARS" style={A.input} />
-                  <input key={`v${i}`} name={`sv${i}`} defaultValue={s?.v ?? ''} placeholder="03" style={A.input} />
-                  <input key={`d${i}`} name={`sd${i}`} defaultValue={s?.d ?? ''} placeholder="shipping" style={A.input} />
-                </>
+                <React.Fragment key={i}>
+                  <input name={`sk${i}`} defaultValue={s?.k ?? ''} placeholder="e.g. YEARS" style={A.input} />
+                  <input name={`sv${i}`} defaultValue={s?.v ?? ''} placeholder="03" style={A.input} />
+                  <input name={`sd${i}`} defaultValue={s?.d ?? ''} placeholder="shipping" style={A.input} />
+                </React.Fragment>
               );
             })}
           </div>

@@ -87,11 +87,20 @@ export function BlinkCursor({ ch = '▏' }: { ch?: string }) {
 
 // ── Sparkline ────────────────────────────────────────────────────────────────
 
-export function Sparkline({ values, width = 16 }: { values: number[]; width?: number }) {
-  const chars = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+export function Sparkline({ values, width = 16, height = 18 }: { values: number[]; width?: number; height?: number }) {
   const max = Math.max(...values, 1);
-  const out = values.slice(-width).map((v) => chars[Math.min(7, Math.floor((v / max) * 8))]).join('');
-  return <span style={{ fontFamily: 'inherit', color: 'var(--t-bar)', letterSpacing: 0 }}>{out}</span>;
+  const slice = values.slice(-width);
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 1, height, verticalAlign: 'middle' }}>
+      {slice.map((v, i) => (
+        <span key={i} style={{
+          display: 'inline-block', width: 3, flexShrink: 0,
+          height: Math.max(2, Math.round((v / max) * height)),
+          background: 'var(--t-bar)',
+        }} />
+      ))}
+    </span>
+  );
 }
 
 // ── CharBar ──────────────────────────────────────────────────────────────────
