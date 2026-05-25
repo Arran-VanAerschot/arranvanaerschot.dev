@@ -309,7 +309,7 @@ export function ContactSection() {
             {([
               ['github',     identity.github,   '↗', identity.github   || null],
               ['linkedin',   identity.linkedin, '↗', identity.linkedin || null],
-              ['read.cv',    identity.readcv,   '↗', identity.readcv   || null],
+
               ...(identity.resumeUrl ? [['resume.pdf', 'download', '↓', identity.resumeUrl]] : []),
             ] as [string, string, string, string | null][]).map(([k, v, a, href]) => (
               <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
