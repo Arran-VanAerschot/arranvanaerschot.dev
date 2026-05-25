@@ -402,14 +402,17 @@ export function ContactSection() {
               ['linkedin',   identity.linkedin, '↗', identity.linkedin || null],
 
               ...(identity.resumeUrl ? [['resume.pdf', 'download', '↓', identity.resumeUrl]] : []),
-            ] as [string, string, string, string | null][]).map(([k, v, a, href]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
-                <span style={{ color: 'var(--t-dim)', flexShrink: 0 }}>{k}</span>
-                {href
-                  ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{v.replace(/^https?:\/\//, '')} <span style={{ color: 'var(--t-accent)' }}>{a}</span></a>
-                  : <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{v} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>}
-              </div>
-            ))}
+            ] as [string, string, string, string | null][]).map(([k, v, a, href]) => {
+              const slug = v.replace(/^https?:\/\//, '').split('/').filter(Boolean).pop() ?? v;
+              return (
+                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
+                  <span style={{ color: 'var(--t-dim)', flexShrink: 0 }}>{k}</span>
+                  {href
+                    ? <a href={href} target="_blank" rel="noopener noreferrer">{slug} <span style={{ color: 'var(--t-accent)' }}>{a}</span></a>
+                    : <span>{slug} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>}
+                </div>
+              );
+            })}
           </BoxFrame>
         </div>
       </div>
