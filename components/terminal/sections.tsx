@@ -27,7 +27,7 @@ export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?
           {[
             ['cat', 'resume.pdf'],
             ['ssh', identity.email],
-            ['gh', 'follow ava'],
+            ['gh', 'follow Arran-VanAerschot'],
           ].map(([c, t], i) => (
             <span key={i} style={{ whiteSpace: 'nowrap' }}>
               <span style={{ color: 'var(--t-dim)' }}>$ </span>
