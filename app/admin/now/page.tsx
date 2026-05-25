@@ -48,19 +48,21 @@ export default async function NowPage({ searchParams }: { searchParams: Promise<
 
       <div style={A.card}>
         {items.map((n) => (
-          <form key={n.id} action={updateNow} style={{ display: 'grid', gridTemplateColumns: '100px 1fr 60px 80px 80px', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #1e1e1e' }}>
-            <input type="hidden" name="id" value={n.id} />
-            <select name="tag" defaultValue={n.tag} style={{ ...A.input, padding: '5px 8px' }}>
-              {TAGS.map(t => <option key={t} value={t}>{t.trim()}</option>)}
-            </select>
-            <input name="text" defaultValue={n.text} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
-            <input name="sort" type="number" defaultValue={n.sortOrder} style={{ ...A.input, padding: '5px 8px' }} />
-            <button type="submit" style={A.btnSm}>save</button>
+          <div key={n.id} style={{ display: 'grid', gridTemplateColumns: '100px 1fr 60px 80px 80px', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #1e1e1e' }}>
+            <form action={updateNow} style={{ display: 'contents' }}>
+              <input type="hidden" name="id" value={n.id} />
+              <select name="tag" defaultValue={n.tag} style={{ ...A.input, padding: '5px 8px' }}>
+                {TAGS.map(t => <option key={t} value={t}>{t.trim()}</option>)}
+              </select>
+              <input name="text" defaultValue={n.text} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
+              <input name="sort" type="number" defaultValue={n.sortOrder} style={{ ...A.input, padding: '5px 8px' }} />
+              <button type="submit" style={A.btnSm}>save</button>
+            </form>
             <form action={deleteNow}>
               <input type="hidden" name="id" value={n.id} />
               <button type="submit" style={A.btnDanger}>del</button>
             </form>
-          </form>
+          </div>
         ))}
         {items.length === 0 && <div style={{ color: '#555' }}>no items yet.</div>}
       </div>

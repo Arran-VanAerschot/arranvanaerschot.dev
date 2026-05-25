@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore as noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { identity } from '@/lib/db/schema';
@@ -28,6 +28,7 @@ async function saveIdentity(formData: FormData) {
 }
 
 export default async function IdentityPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  noStore();
   const { saved } = await searchParams;
   const id = await db.query.identity.findFirst();
   const F = (name: string, label: string, value: string, type = 'text') => (

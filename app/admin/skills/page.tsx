@@ -51,18 +51,20 @@ export default async function SkillsPage({ searchParams }: { searchParams: Promi
           <span>process</span><span>cpu%</span><span>cmd</span><span>sort</span><span></span><span></span>
         </div>
         {items.map((s) => (
-          <form key={s.id} action={updateSkill} style={{ display: 'grid', gridTemplateColumns: '1.2fr 60px 2fr 60px 80px 80px', gap: 8, alignItems: 'center', padding: '6px 0', borderBottom: '1px solid #1e1e1e' }}>
-            <input type="hidden" name="id" value={s.id} />
-            <input name="proc" defaultValue={s.proc} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
-            <input name="cpu"  type="number" min={0} max={100} defaultValue={s.cpu}  style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
-            <input name="cmd"  defaultValue={s.cmd}  style={{ ...A.input, padding: '5px 8px', fontSize: 12, fontFamily: 'ui-monospace, monospace' }} />
-            <input name="sort" type="number" defaultValue={s.sortOrder} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
-            <button type="submit" style={A.btnSm}>save</button>
-            <form action={deleteSkill} style={{ display: 'inline' }}>
+          <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 60px 2fr 60px 80px 80px', gap: 8, alignItems: 'center', padding: '6px 0', borderBottom: '1px solid #1e1e1e' }}>
+            <form action={updateSkill} style={{ display: 'contents' }}>
+              <input type="hidden" name="id" value={s.id} />
+              <input name="proc" defaultValue={s.proc} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
+              <input name="cpu"  type="number" min={0} max={100} defaultValue={s.cpu}  style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
+              <input name="cmd"  defaultValue={s.cmd}  style={{ ...A.input, padding: '5px 8px', fontSize: 12, fontFamily: 'ui-monospace, monospace' }} />
+              <input name="sort" type="number" defaultValue={s.sortOrder} style={{ ...A.input, padding: '5px 8px', fontSize: 13 }} />
+              <button type="submit" style={A.btnSm}>save</button>
+            </form>
+            <form action={deleteSkill}>
               <input type="hidden" name="id" value={s.id} />
               <button type="submit" style={A.btnDanger}>del</button>
             </form>
-          </form>
+          </div>
         ))}
       </div>
 
