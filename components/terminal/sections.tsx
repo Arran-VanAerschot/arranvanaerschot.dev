@@ -336,6 +336,7 @@ function useSpotify() {
 
 export function NowSection() {
   const { now } = useContent();
+  const mobile = useIsMobile();
   const [tick, setTick] = useState(0);
   const spotify = useSpotify();
   useEffect(() => {
@@ -343,11 +344,15 @@ export function NowSection() {
     return () => clearInterval(i);
   }, []);
 
+  const fmt = (d: Date) => {
+    const iso = d.toISOString().replace('T', ' ');
+    return mobile ? iso.slice(11, 19) : iso.slice(0, 19);
+  };
+
   return (
     <Section id="sec-now" label="05 Now" path="~" cmd="tail -f ~/now.log">
       {now.map((n, i) => {
-        const ts = new Date(Date.now() - (now.length - i) * 60000 - tick * 1000)
-          .toISOString().replace('T', ' ').slice(0, 19);
+        const ts = fmt(new Date(Date.now() - (now.length - i) * 60000 - tick * 1000));
         return (
           <div key={i} style={{ padding: '4px 0', fontSize: 13 }}>
             <span style={{ color: 'var(--t-dim)' }}>{ts}</span>{' '}
@@ -358,7 +363,7 @@ export function NowSection() {
       })}
       {spotify.isPlaying && (
         <div style={{ padding: '4px 0', fontSize: 13 }}>
-          <span style={{ color: 'var(--t-dim)' }}>{new Date(Date.now() - tick * 1000).toISOString().replace('T', ' ').slice(0, 19)}</span>{' '}
+          <span style={{ color: 'var(--t-dim)' }}>{fmt(new Date(Date.now() - tick * 1000))}</span>{' '}
           <span style={{ color: '#1DB954' }}>[PLAY ]</span>{' '}
           <a href={spotify.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--t-fg)', textDecoration: 'none' }}>
             {spotify.title} <span style={{ color: 'var(--t-dim)' }}>— {spotify.artist}</span>
@@ -398,11 +403,11 @@ export function ContactSection() {
 
               ...(identity.resumeUrl ? [['resume.pdf', 'download', '↓', identity.resumeUrl]] : []),
             ] as [string, string, string, string | null][]).map(([k, v, a, href]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
-                <span style={{ color: 'var(--t-dim)' }}>{k}</span>
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '6px 0', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 13 }}>
+                <span style={{ color: 'var(--t-dim)', flexShrink: 0 }}>{k}</span>
                 {href
-                  ? <a href={href} target="_blank" rel="noopener noreferrer">{v.replace(/^https?:\/\//, '')} <span style={{ color: 'var(--t-accent)' }}>{a}</span></a>
-                  : <span>{v} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>}
+                  ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{v.replace(/^https?:\/\//, '')} <span style={{ color: 'var(--t-accent)' }}>{a}</span></a>
+                  : <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{v} <span style={{ color: 'var(--t-accent)' }}>{a}</span></span>}
               </div>
             ))}
           </BoxFrame>
