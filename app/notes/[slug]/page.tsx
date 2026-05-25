@@ -7,8 +7,9 @@ export async function generateStaticParams() {
   return listNotes().map((n) => ({ slug: n.slug }));
 }
 
-export default function NotePage({ params }: { params: { slug: string } }) {
-  const note = getNote(params.slug);
+export default async function NotePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const note = getNote(slug);
   if (!note) notFound();
 
   return (
@@ -25,7 +26,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
           <span>/</span>
           <Link href="/notes" style={{ color: '#5d5e57', textDecoration: 'none' }}>notes</Link>
           <span>/</span>
-          <span style={{ color: '#d4d3cc' }}>{params.slug}</span>
+          <span style={{ color: '#d4d3cc' }}>{slug}</span>
         </nav>
 
         <div style={{ marginBottom: 8, fontSize: 11, color: '#5d5e57', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
