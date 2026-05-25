@@ -7,7 +7,8 @@ export async function middleware(request: NextRequest) {
   if (!pathname.startsWith('/admin') || pathname === '/admin/login') {
     return NextResponse.next();
   }
-  const token = request.cookies.get('session')?.value;
+  const cookieName = process.env.NODE_ENV === 'production' ? '__Host-session' : 'session';
+  const token = request.cookies.get(cookieName)?.value;
   if (!token) return NextResponse.redirect(new URL('/admin/login', request.url));
   try {
     const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);

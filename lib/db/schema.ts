@@ -57,7 +57,10 @@ export const nowItems = pgTable('now_items', {
 });
 
 export const adminUsers = pgTable('admin_users', {
-  id:           serial('id').primaryKey(),
-  email:        text('email').notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
+  id:             serial('id').primaryKey(),
+  email:          text('email').notNull().unique(),
+  passwordHash:   text('password_hash').notNull(),
+  securityStamp:  text('security_stamp').notNull().default(''),
+  failedAttempts: integer('failed_attempts').notNull().default(0),
+  lockedUntil:    text('locked_until'),
 });

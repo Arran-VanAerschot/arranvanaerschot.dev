@@ -4,11 +4,13 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { identity } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
 async function saveIdentity(formData: FormData) {
   'use server';
+  await requireAuth();
   const data = {
     name:      String(formData.get('name')     ?? ''),
     handle:    String(formData.get('handle')   ?? ''),

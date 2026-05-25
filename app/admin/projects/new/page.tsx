@@ -2,11 +2,13 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../../_styles';
 import ProjectForm from '../_form';
 
 async function createProject(formData: FormData) {
   'use server';
+  await requireAuth();
   const slug = String(formData.get('slug') ?? '').trim().toLowerCase().replace(/\s+/g, '-');
   if (!slug) return;
   await db.insert(projects).values({

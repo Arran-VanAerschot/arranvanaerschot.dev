@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { nowItems } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
@@ -10,6 +11,7 @@ const TAGS = ['BUILD', 'READ ', 'LEARN', 'OPEN '];
 
 async function updateNow(formData: FormData) {
   'use server';
+  await requireAuth();
   const id = Number(formData.get('id'));
   await db.update(nowItems).set({
     tag:       String(formData.get('tag')  ?? ''),
@@ -22,12 +24,14 @@ async function updateNow(formData: FormData) {
 
 async function deleteNow(formData: FormData) {
   'use server';
+  await requireAuth();
   await db.delete(nowItems).where(eq(nowItems.id, Number(formData.get('id'))));
   revalidatePath('/');
 }
 
 async function addNow(formData: FormData) {
   'use server';
+  await requireAuth();
   await db.insert(nowItems).values({
     tag:       String(formData.get('tag')  ?? 'BUILD'),
     text:      String(formData.get('text') ?? ''),

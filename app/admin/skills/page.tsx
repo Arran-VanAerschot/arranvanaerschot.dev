@@ -3,11 +3,13 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { skills } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
 async function updateSkill(formData: FormData) {
   'use server';
+  await requireAuth();
   const id = Number(formData.get('id'));
   await db.update(skills).set({
     proc:      String(formData.get('proc')  ?? ''),
@@ -21,12 +23,14 @@ async function updateSkill(formData: FormData) {
 
 async function deleteSkill(formData: FormData) {
   'use server';
+  await requireAuth();
   await db.delete(skills).where(eq(skills.id, Number(formData.get('id'))));
   revalidatePath('/');
 }
 
 async function addSkill(formData: FormData) {
   'use server';
+  await requireAuth();
   await db.insert(skills).values({
     proc:      String(formData.get('proc') ?? ''),
     cpu:       Number(formData.get('cpu')  ?? 0),

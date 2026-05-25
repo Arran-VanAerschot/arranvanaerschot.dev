@@ -3,11 +3,13 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../../_styles';
 import ProjectForm from '../_form';
 
 async function updateProject(slug: string, formData: FormData) {
   'use server';
+  await requireAuth();
   const data = {
     title:     String(formData.get('title')   ?? ''),
     year:      Number(formData.get('year')    ?? 0),

@@ -1,15 +1,17 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { COOKIE_NAME } from '@/lib/auth';
+import { COOKIE_NAME, requireAuth } from '@/lib/auth';
 
 async function logoutAction() {
   'use server';
+  await requireAuth();
   (await cookies()).delete(COOKIE_NAME);
   redirect('/admin/login');
 }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await requireAuth();
   return (
     <div style={{ minHeight: '100vh', background: '#111', color: '#e5e5e5', fontFamily: 'ui-sans-serif, system-ui, sans-serif', fontSize: 14 }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 28, padding: '0 28px', background: '#1a1a1a', borderBottom: '1px solid #2a2a2a', height: 50 }}>

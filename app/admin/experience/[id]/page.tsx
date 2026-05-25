@@ -3,10 +3,12 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { experience } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../../_styles';
 
 async function updateExperience(id: number, formData: FormData) {
   'use server';
+  await requireAuth();
   await db.update(experience).set({
     whenLabel: String(formData.get('whenLabel') ?? ''),
     role:      String(formData.get('role')      ?? ''),
