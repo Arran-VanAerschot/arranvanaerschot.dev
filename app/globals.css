@@ -223,3 +223,44 @@ html, body {
 /* Back link hover */
 .case-back:hover { border-color: #e8a13a !important; color: #e8a13a !important; }
 
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+
+/* Prevent iOS auto-zoom on input focus (requires font-size ≥ 16px).
+   !important needed to override the inline fontSize: 'inherit' on these inputs. */
+@media (max-width: 768px) {
+  /* Bump the entire prompt-row so the hint ch-unit positioning still aligns */
+  .terminal-prompt-row { font-size: 16px !important; }
+  .terminal-filter-input { font-size: 16px !important; }
+}
+
+/* Case page — mobile layout */
+@media (max-width: 640px) {
+  /* Hide chrome bar decoration text on narrow screens */
+  .case-chrome-center,
+  .case-chrome-quit { display: none; }
+
+  /* Stack footer vertically */
+  .case-footer {
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 4px;
+  }
+
+  /* Scrollable tables */
+  .case-content table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Before/after diff: single column */
+  .case-content .diff {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Scrollable pre blocks */
+  .case-content pre {
+    max-width: calc(100vw - 48px);
+  }
+}
+

@@ -93,6 +93,7 @@ export function ProjectsSection({ variant }: { variant: string }) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="try `csharp`, `cli`, `2025`…"
           spellCheck={false}
+          className="terminal-filter-input"
           style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--t-fg)', font: 'inherit' }}
         />
         <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{filtered.length}/{projects.length}</span>

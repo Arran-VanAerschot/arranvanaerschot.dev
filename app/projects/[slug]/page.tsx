@@ -73,10 +73,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, #e8a13a 70%, transparent)' }} />
           <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'color-mix(in oklab, #7eb87e 70%, transparent)' }} />
         </div>
-        <div style={{ flex: 1, textAlign: 'center', color: '#5d5e57' }}>
+        <div className="case-chrome-center" style={{ flex: 1, textAlign: 'center', color: '#5d5e57' }}>
           root@arranvanaerschot ~ /portfolio/cases/{slug} · less
         </div>
-        <div style={{ color: '#5d5e57' }}>↑ q to quit</div>
+        <div className="case-chrome-quit" style={{ color: '#5d5e57' }}>↑ q to quit</div>
       </div>
 
       <div style={{ maxWidth: 880, margin: '0 auto', padding: '0 24px' }}>
@@ -155,7 +155,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </Link>
 
         {/* Footer */}
-        <div style={{
+        <div className="case-footer" style={{
           borderTop: '1px solid #2a2b27',
           marginTop: 60,
           padding: '16px 0',

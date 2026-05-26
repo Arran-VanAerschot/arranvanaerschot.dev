@@ -408,13 +408,12 @@ export function TerminalPrompt({ setTweak, reboot }: TerminalPromptProps) {
 
       <form onSubmit={submit} style={{ display: 'flex', alignItems: 'baseline', marginTop: 4 }}>
         <Prompt />
-        <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'baseline' }}>
+        <div className="terminal-prompt-row" style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'baseline' }}>
           <input
             ref={inputRef}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={onKeyDown}
-            autoFocus
             spellCheck={false}
             autoComplete="off"
             style={{
