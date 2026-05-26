@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getProject } from '@/lib/content';
+import { Arch, Lane, Node, Arrow } from '@/components/case/arch';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -95,7 +96,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         {/* Body */}
         <div className="case-content">
-          <MDXRemote source={project.body} />
+          <MDXRemote source={project.body} components={{ Arch, Lane, Node, Arrow }} />
         </div>
 
         {/* Terminal cursor */}

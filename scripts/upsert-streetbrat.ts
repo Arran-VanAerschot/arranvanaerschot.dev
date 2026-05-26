@@ -32,39 +32,30 @@ Three constraints, in order:
 
 **Server-first frontend.** Next.js App Router with React Server Components by default. No client-side state that doesn't need to be client-side. Server Actions for all mutations. The reader site fetches from the .NET API at request time; there's no build-time export step to break.
 
-<div style={{ display: 'flex', flexDirection: 'column', gap: '18px', margin: '18px 0' }}>
-  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
-    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>editorial pipeline</span>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>pitch inbox</div>
-      <span style={{ color: '#5d5e57' }}>→</span>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>draft</div>
-      <span style={{ color: '#5d5e57' }}>→</span>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>review</div>
-      <span style={{ color: '#5d5e57' }}>→</span>
-      <div style={{ border: '1px solid #e8a13a', padding: '6px 12px', fontSize: '13px', color: '#e8a13a', whiteSpace: 'nowrap' }}>publish</div>
-    </div>
-  </div>
-  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
-    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>runtime</span>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>admin panel</div>
-      <span style={{ color: '#5d5e57' }}>→</span>
-      <div style={{ border: '1px solid #e8a13a', padding: '6px 12px', fontSize: '13px', color: '#e8a13a', whiteSpace: 'nowrap' }}>.NET 10 API</div>
-      <span style={{ color: '#5d5e57' }}>←</span>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>next.js reader · RSC</div>
-    </div>
-  </div>
-  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
-    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>data</span>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>postgres · articles</div>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>S3 · images</div>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>identity · TOTP</div>
-      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>audit log</div>
-    </div>
-  </div>
-</div>
+<Arch>
+  <Lane label="editorial pipeline">
+    <Node>pitch inbox</Node>
+    <Arrow />
+    <Node>draft</Node>
+    <Arrow />
+    <Node>review</Node>
+    <Arrow />
+    <Node accent>publish</Node>
+  </Lane>
+  <Lane label="runtime">
+    <Node>admin panel</Node>
+    <Arrow />
+    <Node accent>.NET 10 API</Node>
+    <Arrow left />
+    <Node>next.js reader · RSC</Node>
+  </Lane>
+  <Lane label="data">
+    <Node dim>postgres · articles</Node>
+    <Node dim>S3 · images</Node>
+    <Node dim>identity · TOTP</Node>
+    <Node dim>audit log</Node>
+  </Lane>
+</Arch>
 
 The image pipeline is a single POST to the API: magic-byte check, dimension validation, strip EXIF, upload to S3, return a URL with the focal-point coordinate stored alongside. The Next.js \`<Image>\` component uses the coordinate to set CSS \`object-position\` — no client-side crop, no canvas, no lambda.
 
