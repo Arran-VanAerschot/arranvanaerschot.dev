@@ -5,58 +5,34 @@ summary: The non-obvious things that cost me time — and what I'd do differentl
 tags: [retrospective, dotnet, nextjs, devops]
 ---
 
-  ## Contract-first was worth it
+## Contract-first was worth it
 
-  Writing the .NET `record` DTO first, then the matching TypeScript
-  `interface`, felt like double work at the start. It paid off fast.
-  Because both sides use camelCase JSON (`JsonNamingPolicy.CamelCase` +
-  `JsonStringEnumConverter`), there's zero mapping glue — and when a shape
-  drifts, the TS compiler catches it the moment I touch the frontend. The
-  discipline of "DTO before UI" kept the API honest.
+Writing the .NET `record` DTO first, then the matching TypeScript `interface`, felt like double work at the start. It paid off fast. Because both sides use camelCase JSON (`JsonNamingPolicy.CamelCase` + `JsonStringEnumConverter`), there's zero mapping glue — and when a shape drifts, the TS compiler catches it the moment I touch the frontend. The discipline of "DTO before UI" kept the API honest.
 
-  ## React 19 server actions reset uncontrolled inputs
+## React 19 server actions reset uncontrolled inputs
 
-  This one burned an afternoon. A hidden input holding a derived JSON blob
-  kept reverting after a Server Action re-render. The fix: never trust
-  `defaultValue` for derived state — use a controlled `value=`.
-  Uncontrolled hidden fields are not safe across action round-trips in
-  React 19.
+This one burned an afternoon. A hidden input holding a derived JSON blob kept reverting after a Server Action re-render. The fix: never trust `defaultValue` for derived state — use a controlled `value=`. Uncontrolled hidden fields are not safe across action round-trips in React 19.
 
-  ## Secrets leak in the most boring ways
+## Secrets leak in the most boring ways
 
-  The Resend key and a placeholder JWT signing key ended up committed
-  before the security pass. Lesson: wire up `.env.example` + a real secrets
-   story on day one, not as a hardening afterthought. Rotating a leaked key
-   is always more annoying than never committing it.
+The Resend key and a placeholder JWT signing key ended up committed before the security pass. Lesson: wire up `.env.example` and a real secrets story on day one, not as a hardening afterthought. Rotating a leaked key is always more annoying than never committing it.
 
-  ## Auth is more than "issue a token"
-  The first version just minted a JWT and called it done. A real login
-  needs lockout on repeated failures, 2FA at the API layer (not just the
-  UI), and security-stamp revocation so a password change actually kills
-  existing sessions. Each of these is small on its own; skipping them
-  quietly leaves the door open.
+## Auth is more than "issue a token"
 
-  ## Next.js route exports can conflict silently
+The first version just minted a JWT and called it done. A real login needs lockout on repeated failures, 2FA at the API layer (not just the UI), and security-stamp revocation so a password change actually kills existing sessions. Each of these is small on its own; skipping them quietly leaves the door open.
 
-  The `robots.txt` route broke because it exported both `revalidate` and
-  `force-dynamic` — incompatible directives that Next.js won't let you
-  combine. The error message wasn't obvious. Takeaway: route segment config
-   isn't a free-for-all; pick one caching strategy per route and read the
-  constraints.
+## Next.js route exports can conflict silently
 
-  ## Docker non-root users need real account plumbing
+The `robots.txt` route broke because it exported both `revalidate` and `force-dynamic` — incompatible directives that Next.js won't let you combine. The error message wasn't obvious. Takeaway: route segment config isn't a free-for-all; pick one caching strategy per route and read the constraints.
 
-  Creating a non-root user in the backend image needed actual
-  `groupadd`/`useradd`, not a hand-waved `USER` line. Containers still want
-   a valid uid/gid that owns the app files, or the process can't read its
-  own working directory.
+## Docker non-root users need real account plumbing
 
-  ## HTTPS in dev is friction worth automating
+Creating a non-root user in the backend image needed actual `groupadd`/`useradd`, not a hand-waved `USER` line. Containers still want a valid uid/gid that owns the app files, or the process can't read its own working directory.
 
-  Getting Next.js to trust the ASP.NET dev cert (via `NODE_EXTRA_CA_CERTS`)
-   is fiddly and machine-specific — the path is hardcoded per dev. If I
-  started over I'd script the cert export so onboarding isn't "edit this
-  path in package.json."
+## HTTPS in dev is friction worth automating
 
-  Shipping v1 meant naming these out loud rather than pretending they
-  didn't exist.
+Getting Next.js to trust the ASP.NET dev cert (via `NODE_EXTRA_CA_CERTS`) is fiddly and machine-specific — the path is hardcoded per dev. If I started over I'd script the cert export so onboarding isn't "edit this path in package.json."
+
+---
+
+Shipping v1 meant naming these out loud rather than pretending they didn't exist.
