@@ -32,24 +32,39 @@ Three constraints, in order:
 
 **Server-first frontend.** Next.js App Router with React Server Components by default. No client-side state that doesn't need to be client-side. Server Actions for all mutations. The reader site fetches from the .NET API at request time; there's no build-time export step to break.
 
-\`\`\`
-┌──────────────────────────────────────────────────────────────────────────┐
-│                                                                          │
-│  pitch inbox --> [ draft ] --> [ review ] --> [ publish ]               │
-│                                                    │                    │
-│                                              postgres (articles)         │
-│                                                    │                    │
-│                       ┌────────────────────────────┘                    │
-│                       │                                                  │
-│             next.js reader site                                          │
-│         (RSC · server actions · no client state)                        │
-│                       │                                                  │
-│          .NET 10 API  <---- admin panel (bespoke)                       │
-│               │                    │                                    │
-│        postgres · s3         identity · TOTP                            │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
-\`\`\`
+<div className="arch">
+  <div className="arch-lane">
+    <span className="arch-lane-label">editorial pipeline</span>
+    <div className="arch-flow">
+      <div className="node">pitch inbox</div>
+      <span className="arrow">→</span>
+      <div className="node">draft</div>
+      <span className="arrow">→</span>
+      <div className="node">review</div>
+      <span className="arrow">→</span>
+      <div className="node accent">publish</div>
+    </div>
+  </div>
+  <div className="arch-lane">
+    <span className="arch-lane-label">runtime</span>
+    <div className="arch-flow">
+      <div className="node">admin panel</div>
+      <span className="arrow">→</span>
+      <div className="node accent">.NET 10 API</div>
+      <span className="arrow">←</span>
+      <div className="node">next.js reader · RSC</div>
+    </div>
+  </div>
+  <div className="arch-lane">
+    <span className="arch-lane-label">data</span>
+    <div className="arch-flow">
+      <div className="node dim">postgres · articles</div>
+      <div className="node dim">S3 · images</div>
+      <div className="node dim">identity · TOTP</div>
+      <div className="node dim">audit log</div>
+    </div>
+  </div>
+</div>
 
 The image pipeline is a single POST to the API: magic-byte check, dimension validation, strip EXIF, upload to S3, return a URL with the focal-point coordinate stored alongside. The Next.js \`<Image>\` component uses the coordinate to set CSS \`object-position\` — no client-side crop, no canvas, no lambda.
 

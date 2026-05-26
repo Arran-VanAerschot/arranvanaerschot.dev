@@ -180,6 +180,16 @@ html, body {
 }
 .case-content tbody tr td:first-child { color: #5d5e57; white-space: nowrap; }
 
+/* Architecture diagram */
+.case-content .arch { display: flex; flex-direction: column; gap: 18px; margin: 18px 0; }
+.case-content .arch-lane { border: 1px solid #2a2b27; padding: 14px 16px; }
+.case-content .arch-lane-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #5d5e57; margin-bottom: 10px; }
+.case-content .arch-flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.case-content .node { border: 1px solid #2a2b27; padding: 6px 12px; font-size: 13px; color: #d4d3cc; white-space: nowrap; }
+.case-content .node.accent { border-color: #e8a13a; color: #e8a13a; }
+.case-content .node.dim { color: #5d5e57; }
+.case-content .arrow { color: #5d5e57; font-size: 14px; }
+
 /* KPI boxes */
 .case-content .kpis {
   display: grid;
