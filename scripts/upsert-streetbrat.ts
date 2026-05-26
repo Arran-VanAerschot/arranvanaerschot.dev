@@ -59,28 +59,45 @@ Every admin action — article create/update/delete, user changes, settings edit
 
 ## outcome
 
-| | |
-|---|---|
-| **hero layouts** | 4 — stacked · split · title-over · full-bleed |
-| **image control** | focal-point per image, per article |
-| **auth** | TOTP 2FA + lockout + stamp revocation |
-| **migrations** | 45 — zero manual schema changes in prod |
-| **admin controllers** | 27 — articles · images · newsletter · pitches · redirects · SEO · tags · users · analytics · audit · more |
-| **commits** | 220 — Jan → May 2026 |
+<div className="kpis">
+  <div className="kpi"><div className="lbl">Hero Layouts</div><div className="v">4</div><div className="d">stacked · split · title-over · full-bleed</div></div>
+  <div className="kpi"><div className="lbl">Image Control</div><div className="v">focal·pt</div><div className="d">per image, per article</div></div>
+  <div className="kpi"><div className="lbl">Auth</div><div className="v">TOTP</div><div className="d">2FA + lockout + stamp revocation</div></div>
+  <div className="kpi"><div className="lbl">Migrations</div><div className="v">45</div><div className="d">zero manual schema changes in prod</div></div>
+  <div className="kpi"><div className="lbl">Controllers</div><div className="v">27</div><div className="d">articles · images · newsletter · pitches · more</div></div>
+  <div className="kpi"><div className="lbl">Commits</div><div className="v">220</div><div className="d">Jan → May 2026</div></div>
+</div>
 
 ---
 
 ## before / after
 
-| | before (off-the-shelf) | after (this stack) |
-|---|---|---|
-| brand fit | theme constraints, perpetual overrides | total — fonts, spacing, colour, motion owned |
-| image handling | auto-centered, no focal control | drag-to-focal, per-image coordinate stored |
-| hero layouts | 1 (whatever the theme does) | 4, chosen per article in the editor |
-| pitch workflow | email thread + spreadsheet | inbox → draft → publish in one UI |
-| newsletter | third-party, separate login | in-house broadcasts via Resend, same admin |
-| audit trail | none | append-only log, every admin action |
-| 2FA | optional, platform-dependent | TOTP enforced, no bypass |
+<div className="diff">
+  <div className="before">
+    <h4>before</h4>
+    <dl>
+      <dt>brand fit</dt><dd>theme constraints, perpetual overrides</dd>
+      <dt>image handling</dt><dd>auto-centered, no focal control</dd>
+      <dt>hero layouts</dt><dd>1 (whatever the theme does)</dd>
+      <dt>pitch workflow</dt><dd>email thread + spreadsheet</dd>
+      <dt>newsletter</dt><dd>third-party, separate login</dd>
+      <dt>audit trail</dt><dd>none</dd>
+      <dt>2FA</dt><dd>optional, platform-dependent</dd>
+    </dl>
+  </div>
+  <div className="after">
+    <h4>after</h4>
+    <dl>
+      <dt>brand fit</dt><dd>total — fonts, spacing, colour, motion owned</dd>
+      <dt>image handling</dt><dd>drag-to-focal, coordinate stored per image</dd>
+      <dt>hero layouts</dt><dd>4, chosen per article in the editor</dd>
+      <dt>pitch workflow</dt><dd>inbox → draft → publish in one UI</dd>
+      <dt>newsletter</dt><dd>in-house broadcasts via Resend, same admin</dd>
+      <dt>audit trail</dt><dd>append-only log, every admin action</dd>
+      <dt>2FA</dt><dd>TOTP enforced, no bypass</dd>
+    </dl>
+  </div>
+</div>
 
 ---
 

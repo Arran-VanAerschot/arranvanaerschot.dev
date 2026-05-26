@@ -17,7 +17,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!project || !project.published) notFound();
 
   return (
-    <div style={{
+    <div className="case-page" style={{
       minHeight: '100vh',
       background: '#0c0d0e',
       color: '#d4d3cc',
