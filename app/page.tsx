@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 import { getContent } from '@/lib/content';
 import { listNotes } from '@/lib/notes';
 import { ContentProvider } from '@/components/terminal/content-context';
