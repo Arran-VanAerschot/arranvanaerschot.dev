@@ -32,36 +32,36 @@ Three constraints, in order:
 
 **Server-first frontend.** Next.js App Router with React Server Components by default. No client-side state that doesn't need to be client-side. Server Actions for all mutations. The reader site fetches from the .NET API at request time; there's no build-time export step to break.
 
-<div className="arch">
-  <div className="arch-lane">
-    <span className="arch-lane-label">editorial pipeline</span>
-    <div className="arch-flow">
-      <div className="node">pitch inbox</div>
-      <span className="arrow">→</span>
-      <div className="node">draft</div>
-      <span className="arrow">→</span>
-      <div className="node">review</div>
-      <span className="arrow">→</span>
-      <div className="node accent">publish</div>
+<div style={{ display: 'flex', flexDirection: 'column', gap: '18px', margin: '18px 0' }}>
+  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
+    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>editorial pipeline</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>pitch inbox</div>
+      <span style={{ color: '#5d5e57' }}>→</span>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>draft</div>
+      <span style={{ color: '#5d5e57' }}>→</span>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>review</div>
+      <span style={{ color: '#5d5e57' }}>→</span>
+      <div style={{ border: '1px solid #e8a13a', padding: '6px 12px', fontSize: '13px', color: '#e8a13a', whiteSpace: 'nowrap' }}>publish</div>
     </div>
   </div>
-  <div className="arch-lane">
-    <span className="arch-lane-label">runtime</span>
-    <div className="arch-flow">
-      <div className="node">admin panel</div>
-      <span className="arrow">→</span>
-      <div className="node accent">.NET 10 API</div>
-      <span className="arrow">←</span>
-      <div className="node">next.js reader · RSC</div>
+  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
+    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>runtime</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>admin panel</div>
+      <span style={{ color: '#5d5e57' }}>→</span>
+      <div style={{ border: '1px solid #e8a13a', padding: '6px 12px', fontSize: '13px', color: '#e8a13a', whiteSpace: 'nowrap' }}>.NET 10 API</div>
+      <span style={{ color: '#5d5e57' }}>←</span>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#d4d3cc', whiteSpace: 'nowrap' }}>next.js reader · RSC</div>
     </div>
   </div>
-  <div className="arch-lane">
-    <span className="arch-lane-label">data</span>
-    <div className="arch-flow">
-      <div className="node dim">postgres · articles</div>
-      <div className="node dim">S3 · images</div>
-      <div className="node dim">identity · TOTP</div>
-      <div className="node dim">audit log</div>
+  <div style={{ border: '1px solid #2a2b27', padding: '14px 16px' }}>
+    <span style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5d5e57', marginBottom: '10px' }}>data</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>postgres · articles</div>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>S3 · images</div>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>identity · TOTP</div>
+      <div style={{ border: '1px solid #2a2b27', padding: '6px 12px', fontSize: '13px', color: '#5d5e57', whiteSpace: 'nowrap' }}>audit log</div>
     </div>
   </div>
 </div>
