@@ -121,7 +121,7 @@ Every admin action — article create/update/delete, user changes, settings edit
 
 - A .NET 10 API (27 controllers, 45 migrations, TOTP 2FA, audit log) running in Docker on a Linux VM.
 - A Next.js 16 reader site — six editorial categories, four hero layouts, focal-point images, article TOC, sitemap, structured SEO fields.
-- A bespoke admin panel: article editor (TinyMCE), image manager, pitch inbox, newsletter broadcasts, social links, redirects, tags, site settings, user management, analytics dashboard.
+- A bespoke admin panel: custom built article page editor, image manager, pitch inbox, newsletter broadcasts, social links, redirects, tags, site settings, user management, analytics dashboard.
 - A deployment stack: single multi-target Dockerfile, docker-compose for the full environment, automatic migration on startup.
 
 > "We finally have a site that looks like us."
