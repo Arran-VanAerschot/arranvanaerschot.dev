@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, ReactNode, CSSProperties } from 'react';
+import { useEffect, useRef, useState, ReactNode, CSSProperties } from 'react';
 import type { Theme, Density } from './types';
 import { useContent } from './content-context';
 
@@ -14,6 +14,20 @@ export function useIsMobile(breakpoint = 640): boolean {
     return () => mq.removeEventListener('change', handler);
   }, [breakpoint]);
   return mobile;
+}
+
+export function useVisibleInterval(callback: () => void, delay: number): void {
+  const cbRef = useRef(callback);
+  cbRef.current = callback;
+  useEffect(() => {
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => { if (id === null) id = setInterval(() => cbRef.current(), delay); };
+    const stop = () => { if (id !== null) { clearInterval(id); id = null; } };
+    const onVisibility = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVisibility); };
+  }, [delay]);
 }
 
 export const T_THEMES: Record<string, Theme> = {

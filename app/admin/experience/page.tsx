@@ -4,18 +4,23 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { experience } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
 async function deleteExperience(formData: FormData) {
   'use server';
-  await db.delete(experience).where(eq(experience.id, Number(formData.get('id'))));
+  await requireAuth();
+  const id = Number(formData.get('id'));
+  if (!Number.isInteger(id) || id <= 0) return;
+  await db.delete(experience).where(eq(experience.id, id));
   revalidatePath('/');
   revalidatePath('/admin/experience');
 }
 
 async function addExperience(formData: FormData) {
   'use server';
+  await requireAuth();
   await db.insert(experience).values({
     whenLabel: String(formData.get('whenLabel') ?? ''),
     role:      String(formData.get('role')      ?? ''),

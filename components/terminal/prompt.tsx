@@ -23,6 +23,10 @@ const CMD_HELP: [string, string][] = [
   ['gh, in, mail',      'open github / linkedin / email'],
   ['theme <name>',      'amber|green|cyan|magenta|paper'],
   ['density <name>',    'compact|comfy|roomy'],
+  ['font <name>',       'jetbrains|plex|geist|ibmvga'],
+  ['view <layout>',     'table|cards|gitlog'],
+  ['crt <on|off>',      'toggle CRT scanline overlay'],
+  ['anim <0-3>',        'set animation level · 0=none 3=full'],
   ['banner',            'reprint the boot banner'],
   ['clear',             'clear scrollback'],
   ['date · uptime · echo', 'the usual suspects'],
@@ -36,7 +40,7 @@ const SECTION_MAP: Record<string, string> = {
   now: 'sec-now', contact: 'sec-contact',
 };
 
-const ALL_CMDS = ['help', 'whoami', 'ls', 'cat', 'open', 'cd', 'skills', 'now', 'contact', 'resume', 'theme', 'density', 'clear', 'date', 'echo', 'man', 'banner'];
+const ALL_CMDS = ['help', 'whoami', 'ls', 'cat', 'open', 'cd', 'skills', 'now', 'contact', 'resume', 'theme', 'density', 'font', 'view', 'crt', 'anim', 'clear', 'date', 'echo', 'man', 'banner'];
 
 interface InterpretCtx {
   go: (id: string) => boolean;
@@ -171,6 +175,33 @@ function interpret(raw: string, ctx: InterpretCtx): OutputLine[] | null {
       if (!densities.includes(arg)) { push('err', `density: ${arg}: unknown · try ${densities.join('|')}`); return out; }
       ctx.setTweak('density', arg);
       push('ok', `density set to ${arg}`);
+      return out;
+    }
+    case 'font': {
+      const fonts = ['jetbrains', 'plex', 'geist', 'ibmvga'];
+      if (!fonts.includes(arg)) { push('err', `font: ${arg}: unknown · try ${fonts.join('|')}`); return out; }
+      ctx.setTweak('font', arg);
+      push('ok', `font set to ${arg}`);
+      return out;
+    }
+    case 'view': {
+      const views = ['table', 'cards', 'gitlog'];
+      if (!views.includes(arg)) { push('err', `view: ${arg}: unknown · try ${views.join('|')}`); return out; }
+      ctx.setTweak('projectsVariant', arg);
+      push('ok', `projects view set to ${arg}`);
+      return out;
+    }
+    case 'crt': {
+      if (arg !== 'on' && arg !== 'off') { push('err', `crt: expected on|off`); return out; }
+      ctx.setTweak('crt', arg === 'on');
+      push('ok', `CRT overlay ${arg}`);
+      return out;
+    }
+    case 'anim': {
+      const n = Number(arg);
+      if (!Number.isInteger(n) || n < 0 || n > 3) { push('err', `anim: expected 0–3`); return out; }
+      ctx.setTweak('animation', n);
+      push('ok', `animation level set to ${n}`);
       return out;
     }
     case 'banner': { ctx.reboot(); return null; }

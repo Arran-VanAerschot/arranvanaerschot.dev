@@ -3,15 +3,17 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from './db';
+import { COOKIE_NAME } from './cookie';
 
-const secret = () => new TextEncoder().encode(process.env.AUTH_SECRET!);
+export { COOKIE_NAME };
+
+const secret = () => {
+  const val = process.env.AUTH_SECRET;
+  if (!val) throw new Error('AUTH_SECRET environment variable is not set');
+  return new TextEncoder().encode(val);
+};
 const ALG = 'HS256';
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-
-// __Host- prefix in production pins the cookie to the exact host + path=/,
-// blocking subdomain overwrites. Requires Secure, so only usable over HTTPS.
-export const COOKIE_NAME =
-  process.env.NODE_ENV === 'production' ? '__Host-session' : 'session';
 
 export const COOKIE_OPTS = {
   httpOnly: true,
@@ -33,7 +35,7 @@ export async function verifySession(
   token: string,
 ): Promise<{ email: string; stamp: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, secret());
+    const { payload } = await jwtVerify(token, secret(), { algorithms: [ALG] });
     return { email: payload.email as string, stamp: payload.stamp as string };
   } catch {
     return null;

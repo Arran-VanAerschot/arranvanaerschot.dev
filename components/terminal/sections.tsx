@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile } from './components';
+import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile, useVisibleInterval } from './components';
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
 
@@ -273,16 +273,13 @@ export function StackSection() {
     skills.map(() => Array.from({ length: 16 }, () => 30 + Math.random() * 60))
   );
 
-  useEffect(() => {
-    const i = setInterval(() => {
-      setHistory((h) => h.map((arr, idx) => {
-        const target = skills[idx]?.cpu ?? 50;
-        const next = Math.round(Math.max(2, Math.min(99, target + (Math.random() - 0.5) * 18)));
-        return [...arr.slice(1), next];
-      }));
-    }, 900);
-    return () => clearInterval(i);
-  }, [skills]);
+  useVisibleInterval(() => {
+    setHistory((h) => h.map((arr, idx) => {
+      const target = skills[idx]?.cpu ?? 50;
+      const next = Math.round(Math.max(2, Math.min(99, target + (Math.random() - 0.5) * 18)));
+      return [...arr.slice(1), next];
+    }));
+  }, 900);
 
   return (
     <Section id="sec-stack" label="04 Stack" path="~" cmd="htop --sort cpu">
@@ -338,8 +335,9 @@ function useSpotify() {
   const isPlayingRef = useRef(false);
   useEffect(() => {
     let cancelled = false;
-    let id: ReturnType<typeof setTimeout>;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     async function poll() {
+      if (cancelled || document.visibilityState !== 'visible') return;
       try {
         const res = await fetch('/api/spotify');
         const data: SpotifyState = await res.json();
@@ -348,10 +346,16 @@ function useSpotify() {
           setState(data);
         }
       } catch { /* ignore */ }
-      if (!cancelled) id = setTimeout(poll, isPlayingRef.current ? 5000 : 10000);
+      if (!cancelled) timeoutId = setTimeout(poll, isPlayingRef.current ? 5000 : 10000);
     }
+    const onVisibility = () => { if (document.visibilityState === 'visible') poll(); };
     poll();
-    return () => { cancelled = true; clearTimeout(id); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      cancelled = true;
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
   return state;
 }
@@ -361,10 +365,7 @@ export function NowSection() {
   const mobile = useIsMobile();
   const [tick, setTick] = useState(0);
   const spotify = useSpotify();
-  useEffect(() => {
-    const i = setInterval(() => setTick((t) => t + 1), 4000);
-    return () => clearInterval(i);
-  }, []);
+  useVisibleInterval(() => setTick((t) => t + 1), 4000);
 
   const fmt = (d: Date) => {
     const iso = d.toISOString().replace('T', ' ');

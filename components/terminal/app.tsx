@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, CSSProperties } from 'react';
 import Link from 'next/link';
-import { T_THEMES, T_FONTS, T_DENSITY, useIsMobile } from './components';
+import { T_THEMES, T_FONTS, T_DENSITY, useIsMobile, useVisibleInterval } from './components';
 import { useContent } from './content-context';
 import { HeroSection, ProjectsSection, ExperienceSection, StackSection, NowSection, ContactSection } from './sections';
 import { TerminalPrompt } from './prompt';
@@ -71,13 +71,12 @@ function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
 function StatusBarTop() {
   const { identity } = useContent();
   const mobile = useIsMobile();
-  const [time, setTime] = useState('');
-  useEffect(() => {
-    const update = () => setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
-    update();
-    const i = setInterval(update, 1000);
-    return () => clearInterval(i);
-  }, []);
+  const [time, setTime] = useState(() =>
+    new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
+  );
+  useVisibleInterval(() => {
+    setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
+  }, 1000);
   return (
     <div style={{
       display: 'flex', alignItems: 'center', padding: '8px 14px',
@@ -136,9 +135,19 @@ const SECTION_LABELS: Record<string, string> = {
   'sec-contact':    '~/contact',
 };
 
+const STORAGE_KEY = 'terminal-tweaks';
+
 export default function TerminalApp() {
   const mobile = useIsMobile();
-  const [t, setValues] = useState<TweakValues>(DEFAULTS);
+  const [t, setValues] = useState<TweakValues>(() => {
+    if (typeof window === 'undefined') return DEFAULTS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? { ...DEFAULTS, ...JSON.parse(saved) } : DEFAULTS;
+    } catch {
+      return DEFAULTS;
+    }
+  });
   const [booted, setBooted] = useState(false);
   const [bootKey, setBootKey] = useState(0);
   const [section, setSection] = useState('~/hero');
@@ -148,6 +157,10 @@ export default function TerminalApp() {
       ? keyOrEdits : { [keyOrEdits as string]: val };
     setValues((prev) => ({ ...prev, ...edits }));
   }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(t)); } catch { /* ignore */ }
+  }, [t]);
 
   useEffect(() => {
     if (!t.boot) setBooted(true);
@@ -161,18 +174,26 @@ export default function TerminalApp() {
   }, [booted]);
 
   useEffect(() => {
-    const onScroll = () => {
-      let active = SECTION_IDS[0];
-      for (const id of SECTION_IDS) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top < 120) active = id;
-      }
-      setSection(SECTION_LABELS[active] || '~/hero');
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target.id);
+          else visible.delete(e.target.id);
+        });
+        let active = SECTION_IDS[0];
+        for (const id of SECTION_IDS) {
+          if (visible.has(id)) active = id;
+        }
+        setSection(SECTION_LABELS[active] || '~/hero');
+      },
+      { rootMargin: '-80px 0px -20% 0px', threshold: 0 },
+    );
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
   }, []);
 
   const theme = T_THEMES[t.theme] || T_THEMES.amber;

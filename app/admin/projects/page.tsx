@@ -3,15 +3,18 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { asc, eq } from 'drizzle-orm';
+import { requireAuth } from '@/lib/auth';
 import { A } from '../_styles';
 import { SavedBanner } from '../_saved-banner';
 
 async function deleteProject(formData: FormData) {
   'use server';
+  await requireAuth();
   const slug = String(formData.get('slug'));
   await db.delete(projects).where(eq(projects.slug, slug));
   revalidatePath('/');
   revalidatePath('/admin/projects');
+  revalidatePath('/projects/' + slug);
 }
 
 export default async function ProjectsListPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
