@@ -3,6 +3,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getNote, listNotes } from '@/lib/notes';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { SITE_URL, AUTHOR } from '@/lib/seo';
 
 export async function generateStaticParams() {
   return listNotes().map((n) => ({ slug: n.slug }));
@@ -12,7 +14,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const note = getNote(slug);
   if (!note) return {};
-  return { title: note.metadata.title };
+  const { title, summary, date, tags } = note.metadata;
+  return {
+    title,
+    description: summary || undefined,
+    alternates: { canonical: `/notes/${slug}` },
+    openGraph: {
+      type: 'article',
+      title,
+      description: summary || undefined,
+      url: `/notes/${slug}`,
+      publishedTime: date || undefined,
+      tags: tags.length ? tags : undefined,
+    },
+  };
 }
 
 export default async function NotePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -21,6 +36,18 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
   if (!note) notFound();
 
   return (
+    <>
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: note.metadata.title,
+        description: note.metadata.summary || undefined,
+        datePublished: note.metadata.date || undefined,
+        author: { '@type': 'Person', name: AUTHOR, url: SITE_URL },
+        url: `${SITE_URL}/notes/${slug}`,
+      }}
+    />
     <div style={{
       minHeight: '100vh',
       background: '#0c0d0e',
@@ -60,5 +87,6 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
         </div>
       </div>
     </div>
+    </>
   );
 }

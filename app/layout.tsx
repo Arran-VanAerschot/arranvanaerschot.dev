@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, IBM_Plex_Mono, VT323, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL, SITE_NAME, DEFAULT_DESCRIPTION, AUTHOR, TWITTER_HANDLE } from "@/lib/seo";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -30,16 +31,27 @@ const geistMono = Geist_Mono({
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "root@arranvanaerschot ~ portfolio",
-    template: "%s · root@arranvanaerschot",
+    default: `${SITE_NAME} ~ portfolio`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description: "Arran Van Aerschot — Junior Software Engineer & Automation Engineer based in Brussels.",
+  description: DEFAULT_DESCRIPTION,
+  authors: [{ name: AUTHOR }],
+  keywords: ['software engineer', 'automation engineer', 'brussels', 'portfolio', 'arran vanaerschot'],
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: TWITTER_HANDLE,
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -1,4 +1,4 @@
-import { asc } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { db } from './db';
 import { identity, projects, experience, skills, nowItems } from './db/schema';
 import type { NoteMetadata } from './notes';
@@ -51,4 +51,11 @@ export async function getProject(slug: string) {
   return db.query.projects.findFirst({
     where: (t, { eq }) => eq(t.slug, slug),
   }) ?? null;
+}
+
+export async function listPublishedProjects() {
+  return db
+    .select({ slug: projects.slug, title: projects.title })
+    .from(projects)
+    .where(eq(projects.published, true));
 }

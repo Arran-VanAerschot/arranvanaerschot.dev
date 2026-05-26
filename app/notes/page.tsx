@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { listNotes } from '@/lib/notes';
 
-export const metadata = { title: 'notes' };
+export const metadata = {
+  title: 'notes',
+  description: 'Writing on software engineering, automation, and building things — by Arran VanAerschot.',
+  alternates: { canonical: '/notes' },
+  openGraph: { title: 'notes', url: '/notes' },
+};
 
 export default function NotesPage() {
   const notes = listNotes();

@@ -2,14 +2,32 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import { getProject } from '@/lib/content';
+import { getProject, listPublishedProjects } from '@/lib/content';
 import { Arch, Lane, Node, Arrow } from '@/components/case/arch';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { SITE_URL, AUTHOR } from '@/lib/seo';
+
+export async function generateStaticParams() {
+  const projects = await listPublishedProjects();
+  return projects.map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProject(slug);
-  if (!project) return {};
-  return { title: project.title };
+  if (!project || !project.published) return { robots: { index: false, follow: false } };
+  const { title, tagline } = project;
+  return {
+    title,
+    description: tagline || undefined,
+    alternates: { canonical: `/projects/${slug}` },
+    openGraph: {
+      type: 'article',
+      title,
+      description: tagline || undefined,
+      url: `/projects/${slug}`,
+    },
+  };
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -18,6 +36,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!project || !project.published) notFound();
 
   return (
+    <>
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Portfolio', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: project.title, item: `${SITE_URL}/projects/${slug}` },
+        ],
+      }}
+    />
     <div className="case-page" style={{
       minHeight: '100vh',
       background: '#0c0d0e',
@@ -140,5 +169,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
     </div>
+    </>
   );
 }
