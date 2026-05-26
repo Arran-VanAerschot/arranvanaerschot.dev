@@ -35,7 +35,7 @@ Three constraints, in order:
 \`\`\`
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                                                                          │
-│  pitch inbox ──▶ [ draft ] ──▶ [ review ] ──▶ [ publish ]              │
+│  pitch inbox --> [ draft ] --> [ review ] --> [ publish ]               │
 │                                                    │                    │
 │                                              postgres (articles)         │
 │                                                    │                    │
@@ -44,7 +44,7 @@ Three constraints, in order:
 │             next.js reader site                                          │
 │         (RSC · server actions · no client state)                        │
 │                       │                                                  │
-│          .NET 10 API  ←──── admin panel (bespoke)                       │
+│          .NET 10 API  <---- admin panel (bespoke)                       │
 │               │                    │                                    │
 │        postgres · s3         identity · TOTP                            │
 │                                                                          │
