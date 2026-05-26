@@ -2,19 +2,6 @@ import { db } from '../lib/db';
 import { projects } from '../lib/db/schema';
 
 const BODY = `
-<div className="case-meta">
-
-| | |
-|---|---|
-| **kind** | editorial platform · production |
-| **year** | 2026 · 4 months |
-| **role** | sole engineer · design, build, ship, on-call |
-| **stack** | .NET 10 · PostgreSQL · Next.js 16 · AWS S3 · Docker |
-| **team** | me + 1 editor (PO) |
-| **repo** | github.com/Arran-VanAerschot/streetbrat-backend (private) |
-
-</div>
-
 Streetbrat is a culture publication covering art, beauty, fashion, film, music, and more. Off-the-shelf platforms — Squarespace, WordPress — impose structure that fights a brand like this at every turn: rigid themes, lowest-common-denominator image handling, CMS UIs built for blog posts not editorial spreads. I built the whole stack from scratch instead: a .NET 10 API, a Next.js 16 reader site, and a bespoke admin that gives editors the tools they actually need — focal-point image picking, multiple hero layouts, a pitch inbox, newsletter broadcasts, and a full audit log. Four months from first commit to production.
 
 ---
@@ -30,6 +17,7 @@ Three things a generic platform can't give a culture publication:
 **A reader experience that isn't a theme.** The frontend needed to be the brand, not a customised template. That means total control over fonts (Druk), typography scale, spacing, and navigation — none of which survive a theme engine intact.
 
 > "We tried three platforms. They all made the site look like every other site."
+>
 > — editor, kickoff
 
 ---
@@ -114,6 +102,7 @@ Every admin action — article create/update/delete, user changes, settings edit
 - A deployment stack: single multi-target Dockerfile, docker-compose for the full environment, automatic migration on startup.
 
 > "We finally have a site that looks like us."
+>
 > — editor, launch day
 `.trim();
 
