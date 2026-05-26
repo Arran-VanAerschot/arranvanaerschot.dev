@@ -116,25 +116,30 @@ function ProjectsTable({ items, toggle, arrow }: {
   if (mobile) {
     return (
       <div>
-        {items.map((p, i) => (
-          <div key={p.id} className="t-row-hover"
-            style={{ padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span>
-                <span style={{ color: 'var(--t-dim)', fontSize: 11, marginRight: 6 }}>{String(i + 1).padStart(2, '0')}</span>
-                <span style={{ color: 'var(--t-accent)' }}>./</span>
-                <span style={{ textDecoration: 'underline', textDecorationStyle: 'dashed', textUnderlineOffset: 3, textDecorationColor: 'var(--t-border)' }}>{p.id}</span>
-              </span>
-              <span style={{ color: 'var(--t-ok)', fontSize: 12 }}>★ {p.stars}</span>
+        {items.map((p, i) => {
+          const row = (
+            <div className="t-row-hover"
+              style={{ padding: '10px 8px', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 50%, transparent)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span>
+                  <span style={{ color: 'var(--t-dim)', fontSize: 11, marginRight: 6 }}>{String(i + 1).padStart(2, '0')}</span>
+                  <span style={{ color: 'var(--t-accent)' }}>./</span>
+                  <span style={{ textDecoration: 'underline', textDecorationStyle: p.published ? 'solid' : 'dashed', textUnderlineOffset: 3, textDecorationColor: p.published ? 'var(--t-accent)' : 'var(--t-border)' }}>{p.id}</span>
+                </span>
+                <span style={{ color: 'var(--t-ok)', fontSize: 12 }}>★ {p.stars}</span>
+              </div>
+              <div style={{ marginTop: 4, fontSize: 12, color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))' }}>{p.tagline}</div>
+              <div style={{ marginTop: 4, display: 'flex', gap: 8, fontSize: 11 }}>
+                <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
+                <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
+                <span style={{ color: 'var(--t-info)' }}>{p.stack.join(', ')}</span>
+              </div>
             </div>
-            <div style={{ marginTop: 4, fontSize: 12, color: 'color-mix(in oklab, var(--t-fg) 80%, var(--t-bg))' }}>{p.tagline}</div>
-            <div style={{ marginTop: 4, display: 'flex', gap: 8, fontSize: 11 }}>
-              <span style={{ color: 'var(--t-warn)' }}>{p.kind}</span>
-              <span style={{ color: 'var(--t-dim)' }}>{p.y}</span>
-              <span style={{ color: 'var(--t-info)' }}>{p.stack.join(', ')}</span>
-            </div>
-          </div>
-        ))}
+          );
+          return p.published
+            ? <Link key={p.id} href={`/projects/${p.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>{row}</Link>
+            : <div key={p.id}>{row}</div>;
+        })}
         {items.length === 0 && <div style={{ padding: 14, color: 'var(--t-dim)' }}>no matches.</div>}
       </div>
     );
