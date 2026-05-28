@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile, useVisibleInterval } from './components';
+import { Section, BlinkCursor, Oscilloscope, CharBar, BoxFrame, useIsMobile, useVisibleInterval } from './components';
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
 
@@ -377,7 +377,7 @@ export function StackSection() {
               <CharBar pct={s.cpu} width={14} />
               <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
             </span>
-            <span><Sparkline values={history[i] ?? []} width={20} /></span>
+            <span><Oscilloscope values={history[i] ?? []} /></span>
             <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
           </div>
         )

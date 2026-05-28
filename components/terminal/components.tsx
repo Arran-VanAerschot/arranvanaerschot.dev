@@ -115,34 +115,66 @@ export function BlinkCursor({ ch = '▏' }: { ch?: string }) {
   return <span style={{ color: on ? 'var(--t-accent)' : 'transparent', transition: 'color 0.08s' }}>{ch}</span>;
 }
 
-// ── Sparkline ────────────────────────────────────────────────────────────────
+// ── Oscilloscope ─────────────────────────────────────────────────────────────
 
-export function Sparkline({ values, width = 16, height = 18 }: { values: number[]; width?: number; height?: number }) {
-  const max = Math.max(...values, 1);
-  const slice = values.slice(-width);
+export function Oscilloscope({ values, width = 120, height = 22 }: { values: number[]; width?: number; height?: number }) {
+  if (values.length < 2) {
+    return <span style={{ display: 'inline-block', width, height }} />;
+  }
+
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = max - min || 1;
+  const pad = 2;
+  const n = values.length;
+
+  const pts = values.map((v, i) => {
+    const x = (i / (n - 1)) * width;
+    const y = pad + (1 - (v - min) / range) * (height - pad * 2);
+    return [x, y] as const;
+  });
+
+  // smooth the trace with quadratic midpoints
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i];
+    const [x1, y1] = pts[i + 1];
+    const xc = (x0 + x1) / 2;
+    const yc = (y0 + y1) / 2;
+    d += ` Q${x0.toFixed(1)},${y0.toFixed(1)} ${xc.toFixed(1)},${yc.toFixed(1)}`;
+  }
+  const [lx, ly] = pts[pts.length - 1];
+  d += ` L${lx.toFixed(1)},${ly.toFixed(1)}`;
+
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 1, height, verticalAlign: 'middle' }}>
-      {slice.map((v, i) => (
-        <span key={i} style={{
-          display: 'inline-block', width: 3, flexShrink: 0,
-          height: Math.max(2, Math.round((v / max) * height)),
-          background: 'var(--t-bar)',
-        }} />
-      ))}
-    </span>
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ display: 'block', overflow: 'visible', verticalAlign: 'middle' }}
+      preserveAspectRatio="none"
+    >
+      <line x1={0} y1={height / 2} x2={width} y2={height / 2}
+        stroke="var(--t-border)" strokeWidth={0.5} strokeDasharray="2 3" opacity={0.6} />
+      <path d={d} fill="none" stroke="var(--t-accent)" strokeWidth={1.4}
+        strokeLinejoin="round" strokeLinecap="round"
+        style={{ filter: 'drop-shadow(0 0 2.5px var(--t-accent))' }} />
+      <circle cx={lx} cy={ly} r={1.8} fill="var(--t-accent)"
+        style={{ filter: 'drop-shadow(0 0 3px var(--t-accent))' }} />
+    </svg>
   );
 }
 
 // ── CharBar ──────────────────────────────────────────────────────────────────
 
 export function CharBar({ pct, width = 18 }: { pct: number; width?: number }) {
-  const filled = Math.round((pct / 100) * width);
+  const filled = Math.max(0, Math.min(width, Math.round((pct / 100) * width)));
   const tip = filled > 0 ? 1 : 0;
   return (
-    <span style={{ letterSpacing: 0 }}>
-      <span style={{ color: 'var(--t-bar)' }}>{'█'.repeat(filled - tip)}</span>
-      {tip > 0 && <span style={{ color: 'var(--t-accent)' }}>{'█'}</span>}
-      <span style={{ color: 'color-mix(in oklab, var(--t-border) 60%, var(--t-bg))' }}>{'░'.repeat(width - filled)}</span>
+    <span style={{ letterSpacing: '2px' }}>
+      <span style={{ color: 'var(--t-bar)' }}>{'▰'.repeat(filled - tip)}</span>
+      {tip > 0 && <span style={{ color: 'var(--t-accent)' }}>{'▰'}</span>}
+      <span style={{ color: 'color-mix(in oklab, var(--t-border) 70%, var(--t-bg))' }}>{'▱'.repeat(width - filled)}</span>
     </span>
   );
 }
