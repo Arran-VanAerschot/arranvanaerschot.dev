@@ -71,9 +71,11 @@ function BootSequence({ skip, onDone }: { skip: boolean; onDone: () => void }) {
 function StatusBarTop() {
   const { identity } = useContent();
   const mobile = useIsMobile();
-  const [time, setTime] = useState(() =>
-    new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
-  );
+  // Start empty so server and client first render match; fill in after mount.
+  const [time, setTime] = useState('');
+  useEffect(() => {
+    setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
+  }, []);
   useVisibleInterval(() => {
     setTime(new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC');
   }, 1000);
@@ -139,15 +141,11 @@ const STORAGE_KEY = 'terminal-tweaks';
 
 export default function TerminalApp() {
   const mobile = useIsMobile();
-  const [t, setValues] = useState<TweakValues>(() => {
-    if (typeof window === 'undefined') return DEFAULTS;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? { ...DEFAULTS, ...JSON.parse(saved) } : DEFAULTS;
-    } catch {
-      return DEFAULTS;
-    }
-  });
+  // Always start from DEFAULTS so the server-rendered HTML and the client's
+  // first render match. Saved tweaks are loaded from localStorage after mount
+  // to avoid a hydration mismatch (which crashes the page in production).
+  const [t, setValues] = useState<TweakValues>(DEFAULTS);
+  const [hydrated, setHydrated] = useState(false);
   const [booted, setBooted] = useState(false);
   const [bootKey, setBootKey] = useState(0);
   const [section, setSection] = useState('~/hero');
@@ -159,8 +157,17 @@ export default function TerminalApp() {
   }, []);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setValues((prev) => ({ ...prev, ...JSON.parse(saved) }));
+    } catch { /* ignore */ }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(t)); } catch { /* ignore */ }
-  }, [t]);
+  }, [t, hydrated]);
 
   useEffect(() => {
     if (!t.boot) setBooted(true);
