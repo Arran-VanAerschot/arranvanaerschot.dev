@@ -6,21 +6,89 @@ import { Section, BlinkCursor, Sparkline, CharBar, BoxFrame, useIsMobile, useVis
 import { useContent } from './content-context';
 import type { ContentProject } from './types';
 
+// ── Typewriter cycling role title ─────────────────────────────────────────────
+
+function sharedLeadingWords(a: string, b: string): string {
+  const aw = a.split(' ');
+  const bw = b.split(' ');
+  const shared: string[] = [];
+  for (let i = 0; i < Math.min(aw.length - 1, bw.length - 1); i++) {
+    if (aw[i] === bw[i]) shared.push(aw[i]);
+    else break;
+  }
+  return shared.length > 0 ? shared.join(' ') + ' ' : '';
+}
+
+function TypewriterRole({ parts }: { parts: string[] }) {
+  const [index, setIndex] = useState(0);
+  const [displayed, setDisplayed] = useState('');
+  const [phase, setPhase] = useState<'typing' | 'pause' | 'erasing'>('typing');
+  const [ready, setReady] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!ready || parts.length === 0) return;
+    const current = parts[index];
+    const next = parts[(index + 1) % parts.length];
+
+    if (phase === 'typing') {
+      if (displayed.length < current.length) {
+        timeoutRef.current = setTimeout(
+          () => setDisplayed(current.slice(0, displayed.length + 1)),
+          110,
+        );
+      } else {
+        timeoutRef.current = setTimeout(() => setPhase('pause'), 2200);
+      }
+    } else if (phase === 'pause') {
+      if (parts.length === 1) return;
+      timeoutRef.current = setTimeout(() => setPhase('erasing'), 0);
+    } else {
+      const prefix = sharedLeadingWords(current, next);
+      if (displayed.length > prefix.length) {
+        timeoutRef.current = setTimeout(
+          () => setDisplayed((d) => d.slice(0, -1)),
+          30,
+        );
+      } else {
+        setIndex((i) => (i + 1) % parts.length);
+        setPhase('typing');
+      }
+    }
+
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, [phase, displayed, index, parts, ready]);
+
+  useEffect(() => {
+    setDisplayed('');
+    setIndex(0);
+    setPhase('typing');
+  }, [parts.join('|')]);
+
+  return (
+    <span>
+      {displayed}
+      <BlinkCursor />
+    </span>
+  );
+}
+
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
 export function HeroSection({ banner, ascii: _ascii }: { banner: boolean; ascii?: boolean }) {
   const { identity } = useContent();
   const mobile = useIsMobile();
+  const roleParts = identity.role.split('-').map((p) => p.trim()).filter(Boolean);
   return (
     <Section id="sec-hero" label="01 Hero" path="~" cmd="whoami --verbose">
       <div>
-        <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05 }}>
-          {identity.role.split('·').map((part, i) => (
-            <span key={i}>
-              {i > 0 && <><br /><span style={{ color: 'var(--t-fg)' }}>+ </span></>}
-              <span style={{ color: i === 0 ? 'var(--t-accent)' : 'var(--t-fg)' }}>{part.trim().toLowerCase()}</span>
-            </span>
-          ))}
+        <h1 style={{ margin: 0, fontWeight: 500, letterSpacing: '-0.01em', fontSize: 'clamp(28px, 3.6vw, 44px)', lineHeight: 1.05, color: 'var(--t-accent)' }}>
+          <TypewriterRole parts={roleParts} />
         </h1>
         <p style={{ marginTop: 18, maxWidth: 640, color: 'color-mix(in oklab, var(--t-fg) 78%, var(--t-bg))', lineHeight: 1.6 }}>
           {identity.bio}
