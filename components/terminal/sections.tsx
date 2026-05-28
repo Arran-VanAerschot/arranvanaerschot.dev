@@ -352,7 +352,7 @@ export function StackSection() {
   return (
     <Section id="sec-stack" label="04 Stack" path="~" cmd="htop --sort cpu">
       {!mobile && (
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, color: 'var(--t-dim)', fontSize: 11, padding: '6px 8px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '150px 170px 140px 1fr', gap: 24, color: 'var(--t-dim)', fontSize: 11, padding: '8px 10px', borderBottom: '1px solid var(--t-border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           <span>process</span><span>cpu%</span><span>load</span><span>cmd</span>
         </div>
       )}
@@ -363,21 +363,21 @@ export function StackSection() {
       )}
       {skills.map((s, i) => (
         mobile ? (
-          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
+          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '10px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
             <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <CharBar pct={s.cpu} width={10} />
               <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
             </span>
           </div>
         ) : (
-          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '120px 180px 200px 1fr', gap: 16, padding: '6px 8px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
+          <div key={s.proc} style={{ display: 'grid', gridTemplateColumns: '150px 170px 140px 1fr', gap: 24, padding: '11px 10px', alignItems: 'center', borderBottom: '1px solid color-mix(in oklab, var(--t-border) 40%, transparent)', fontSize: 12 }}>
             <span style={{ color: 'var(--t-info)' }}>{s.proc}</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <CharBar pct={s.cpu} width={14} />
               <span style={{ color: 'var(--t-dim)', fontSize: 11 }}>{s.cpu}%</span>
             </span>
-            <span><Oscilloscope values={history[i] ?? []} /></span>
+            <span><Oscilloscope values={history[i] ?? []} width={140} /></span>
             <span style={{ color: 'var(--t-dim)' }}>{s.cmd}</span>
           </div>
         )
