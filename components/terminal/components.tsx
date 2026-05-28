@@ -171,7 +171,7 @@ export function CharBar({ pct, width = 18 }: { pct: number; width?: number }) {
   const filled = Math.max(0, Math.min(width, Math.round((pct / 100) * width)));
   const tip = filled > 0 ? 1 : 0;
   return (
-    <span style={{ letterSpacing: '2px' }}>
+    <span style={{ letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>
       <span style={{ color: 'var(--t-bar)' }}>{'▰'.repeat(filled - tip)}</span>
       {tip > 0 && <span style={{ color: 'var(--t-accent)' }}>{'▰'}</span>}
       <span style={{ color: 'color-mix(in oklab, var(--t-border) 70%, var(--t-bg))' }}>{'▱'.repeat(width - filled)}</span>
